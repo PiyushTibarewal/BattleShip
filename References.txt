@@ -1,4 +1,32 @@
-https://erg.abdn.ac.uk/users/gorry/eg3567/road-map.html
-https://www.tutorialspoint.com/unix_sockets/index.htm
-http://www.steves-internet-guide.com/
+Basic Networking:
+    https://erg.abdn.ac.uk/users/gorry/eg3567/road-map.html
+    http://www.steves-internet-guide.com/
+Apache:
+    https://www.guru99.com/apache.html#7
+NodeJS:
+    https://www.sitepoint.com/node-js-is-the-new-black/
+    https://www.w3schools.com/nodejs/nodejs_intro.asp
+    https://medium.com/@noufel.gouirhate/build-a-simple-chat-app-with-node-js-and-socket-io-ea716c093088
+Socket Programming:
+    https://www.geeksforgeeks.org/socket-programming-in-java/
+    https://www.tutorialspoint.com/unix_sockets/index.htm
+    https://www.tutorialspoint.com/socket.io/
+    https://socket.io/get-started/chat
+Perl:
+    https://www.tutorialspoint.com/perl/perl_introduction.htm
+    https://users.cs.cf.ac.uk/Dave.Marshall/PERL/node2.html
+CGI Programming basics:
+    http://www.openroad.org/cgihelp/cgi.html
+PHP:
+    https://www.w3schools.com/php/default.asp
+    http://php.net/manual/en/intro-whatcando.php
 
+General:
+    http://www.html5gamedevs.com/topic/1480-how-to-make-multiplayer-online-games/
+    https://www.youtube.com/watch?v=adwOLUpQF0I
+Git Repo Examples:
+    https://github.com/NTaylorMullen/ShootR/tree/master/ShootR/ShootR
+Extra Stuff to try out:
+    http://pomelo.netease.com/
+
+Initial plan: Learn JS and Node.js
