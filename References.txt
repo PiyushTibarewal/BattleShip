@@ -26,6 +26,8 @@ General:
     https://www.youtube.com/watch?v=adwOLUpQF0I
 Git Repo Examples:
     https://github.com/NTaylorMullen/ShootR/tree/master/ShootR/ShootR
+    https://github.com/dvatsav/Chat-Room-server.git
+    https://github.com/Pylons/pyramid.git
 Extra Stuff to try out:
     http://pomelo.netease.com/
 
