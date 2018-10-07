@@ -21,7 +21,7 @@ class App extends React.Component {
     })
   }
   handleSubmit (event) {
-    alert('A username and password  was submitted: ' + this.state.uname + ' ' + this.state.password)
+    // alert('A username and password  was submitted: ' + this.state.uname + ' ' + this.state.password)
     event.preventDefault()
     // fetch('https://localhost:8080/login', {
     //   method: 'POST',
@@ -47,7 +47,7 @@ class App extends React.Component {
     socket.on('submit', function (msg) {
       var text = msg.uname
       var text1 = msg.password
-      text = text + ' ' + text1
+      text = text + ' ' + text1 + ' '
       document.getElementById('root').innerHTML = text
     })
     return (
@@ -179,3 +179,4 @@ class App extends React.Component {
 // }
 
 export default App
+

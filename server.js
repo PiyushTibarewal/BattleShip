@@ -12,14 +12,15 @@ const io = socketIO(server)
 
 io.on('connection', socket => {
   console.log('new client Connected')
-  const id = socket.id
+  console.log(`Socket ${socket.id} connected`)
+  //   const id = socket.id
   socket.on('submit', function (msg) {
     // once we get a 'change color' event from one of our clients, we will send it to the rest of the clients
     // we make use of the socket.emit method again with the argument given to use from the callback function above
     var name = msg.uname
     var pswd = msg.password
     console.log('print Changed to: ', name, pswd)
-    io.sockets.to(id).emit('submit', { uname: this.state.uname, password: this.state.password })
+    io.sockets.emit('submit', { uname: name, password: pswd })
   })
   socket.on('disconnect', () => {
     console.log('user disconnected')
@@ -27,3 +28,4 @@ io.on('connection', socket => {
 })
 
 server.listen(port, () => console.log(`Listening on port ${port}`))
+
