@@ -20,7 +20,9 @@ class Signin extends React.Component {
         password: this.state.password
       })
       .then(function (response) {
-        console.log(response);
+        if(response.data == 'success'){
+          window.location.assign('http://localhost/home')
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -115,6 +117,6 @@ class Signup extends React.Component{
 ReactDOM.render(
     <Router history={hashHistory}>
         <Route component={Signin} path="/"></Route>
-<Route component={Signup} path="/signup"></Route>
-    </Router>,
+        <Route component={Signup} path="/signup"></Route>
+</Router>,
 document.getElementById('app'));
