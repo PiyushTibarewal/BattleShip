@@ -4,6 +4,7 @@ var hashHistory = window.ReactRouter.hashHistory;
 var browserHistory = window.ReactRouter.browserHistory;
 var Link = window.ReactRouter.Link;
 const socket = io();
+var show=null;
 class AddPost extends React.Component {
   constructor(props) {
     super(props);
@@ -101,6 +102,7 @@ class ShowProfile extends React.Component {
       password: '',
       id: ''
     };
+    show=this;
 
   }
   componentDidMount() {
@@ -179,9 +181,9 @@ class ShowPost extends React.Component {
     this.deletePost = this.deletePost.bind(this);
     // this.getPost = this.getPost.bind(this);
     this.state = {
-      posts: this.props.route.something,
+      posts: [],
     };
-
+    show=this;
   }
 
   updatePost(id) {
@@ -203,16 +205,19 @@ class ShowPost extends React.Component {
     }
   }
 
-  
+  changePost(msg){
+    this.setState({posts:msg});
+  }
   
 
   componentDidMount() {
     
+    socket.emit("started-home","Hi");
 
     document.getElementById('homeHyperlink').className = "active";
     document.getElementById('addHyperLink').className = "";
     document.getElementById('profileHyperlink').className = "";
-  }
+  }  
 
   render() {
 
@@ -248,19 +253,20 @@ class ShowPost extends React.Component {
       </table>
     )
   }
-}
-socket.emit("started-home","Hi");
+};
 socket.on('online-users',function(msg){
   var result=JSON.stringify(msg);
   var red=JSON.parse(result);
-  console.log(red[0].username);
-  ReactDOM.render(
-    <Router history={hashHistory}>
-      <Route component={ShowPost} path="/" something={red}></Route>
-      <Route component={AddPost} path="/addPost(/:id)"></Route>
-      <Route component={ShowProfile} path="/showProfile"></Route>
-    </Router>,
-    document.getElementById('app'));
-  
+  console.log("HI");
+  show.changePost(red);
+  console.log(red);
+  console.log("HI");
 }); 
 
+ReactDOM.render(
+  <Router history={hashHistory}>
+    <Route component={ShowPost} path="/"></Route>
+    <Route component={AddPost} path="/addPost(/:id)"></Route>
+    <Route component={ShowProfile} path="/showProfile"></Route>
+  </Router>,
+  document.getElementById('app'));

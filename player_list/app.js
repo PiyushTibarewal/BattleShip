@@ -148,7 +148,7 @@ io.on('connection', function(socket){
 
 socket.on('started-home',function(msg){
   console.log(msg);
-  console.log("YO");
+  console.log("YO");  
   post.getPost(function(result){console.log(result);
     socket.emit('online-users',result)  });
   });
