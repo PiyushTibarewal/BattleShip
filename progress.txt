@@ -1,9 +1,0 @@
-24/09/18:
-	Basic understanding of JS,NodeJS,SQL,ReactJS. 
-TODO:
-	1. Understanding integeration of Socket, Python, NOdeJS,ReactjS,JSON, databasing.(26/09)
-	2. Understanding WebSocket programming.
-	3. Figuring out creaion of random boards.
-	4. Going through different projects online.
-	
-
