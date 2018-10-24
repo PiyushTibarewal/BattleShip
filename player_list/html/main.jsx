@@ -22,7 +22,7 @@ class Signin extends React.Component {
       })
       .then(function (response) {
         if(response.data == 'success'){
-          window.location.assign('http://192.168.0.108:7777/home')
+          window.location.assign('http://192.168.0.104:7777/home')
         }
       })
       .catch(function (error) {

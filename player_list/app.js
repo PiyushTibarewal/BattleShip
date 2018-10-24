@@ -145,7 +145,9 @@ app.post('/getpost', function (req, res) {
 io.on('connection', function(socket){
   
   console.log(socket.id);
-
+socket.on('send-request',function(msg){
+  console.log("from" + sessions.username + " to" + msg);
+});
 socket.on('started-home',function(msg){
   console.log(msg);
   console.log("YO");  

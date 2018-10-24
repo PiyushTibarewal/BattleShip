@@ -186,8 +186,9 @@ class ShowPost extends React.Component {
     show=this;
   }
 
-  updatePost(id) {
-    hashHistory.push('/addPost/' + id);
+  updatePost(username) {
+    //hashHistory.push('/addPost/' + id);
+    socket.emit("send-request",username);
   }
 
   deletePost(id) {
@@ -240,10 +241,10 @@ class ShowPost extends React.Component {
                 <td>{index + 1}</td>
                 <td>{post.username}</td>
                 <td>{post.email}</td>
-                {/* <td>
-                  <span onClick={this.updatePost.bind(this, post.id)} className="glyphicon glyphicon-pencil"></span>
+                 <td>
+                  <span onClick={this.updatePost.bind(this, post.username)} className="glyphicon glyphicon-pencil"></span>
                 </td>
-                <td>
+               {/* <td>
                   <span onClick={this.deletePost.bind(this, post.id)} className="glyphicon glyphicon-remove"></span>
                 </td> */}
               </tr>
