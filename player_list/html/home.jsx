@@ -3,7 +3,11 @@ var Route = window.ReactRouter.Route;
 var hashHistory = window.ReactRouter.hashHistory;
 var browserHistory = window.ReactRouter.browserHistory;
 var Link = window.ReactRouter.Link;
+const io = require('socket.io-client');
+const socket = io();
+socket.on('server_message' , function(message){
 
+var people = JSON.parse(message);
 class AddPost extends React.Component {
     constructor(props) {
       super(props);
@@ -237,13 +241,13 @@ class ShowPost extends React.Component {
                 <th></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody> 
               {
-                this.state.posts.map(function(post,index) {
+                people.map(function(post,index) {
                    return <tr key={index} >
-                            <td>{index+1}</td>
-                            <td>{post.username}</td>
-                            <td>{post.email}</td>
+                            <td>{post}</td>
+                            <td>{post}</td>
+                            <td>{post}</td>
                             <td>
                               <span onClick={this.updatePost.bind(this,post.id)} className="glyphicon glyphicon-pencil"></span>
                             </td>
@@ -266,3 +270,5 @@ ReactDOM.render(
         <Route component={ShowProfile} path="/showProfile"></Route>
     </Router>,
 document.getElementById('app'));
+
+});

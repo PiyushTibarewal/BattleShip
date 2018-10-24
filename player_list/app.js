@@ -6,6 +6,9 @@ var bodyParser = require("body-parser");
 var user = require('./user')
 var post = require('./post')
 //var popup = require('popups');
+const http = require('http');
+const socketio = require('socket.io');
+
 
 var app = express();
 app.use(cookieParser());
@@ -17,20 +20,34 @@ var sessions;
 app.use(express.static(path.join(__dirname,"/html")));
 
 app.use(bodyParser.json());
+var server = http.createServer(app);
+var io = socketio(server);
+
+io.on('connection', function(socket){
+  var online = Object.keys(io.engine.clients);
+  io.emit('server_message',JSON.stringify(online));
+  console.log(socket.id);
+
 
 app.get('/', function(req,res){
 	//sessions.username = null;
   res.sendFile(__dirname + '/html/index.html');
 })
+app.post('/signup', function (req, res) {
+  var name=req.body.name;
+  var email=req.body.email;
+  var password=req.body.password;
 
-app.get('/home', function (req, res) {
-  if(sessions && sessions.username){
-    res.sendFile(__dirname + '/html/home.html');
+  if(name && email && password){
+  	user.signup(name, email, password)
   }
   else{
-    res.send('unauthorized');
+  	res.send('Failure');
   }
 })
+
+
+// console.log(io);
 
 //app.get('/logout', function(req, res) {
 //	sessions= null;
@@ -55,18 +72,18 @@ app.post('/signin', function (req, res) {
   });
 })
 
-app.post('/signup', function (req, res) {
-  var name=req.body.name;
-  var email=req.body.email;
-  var password=req.body.password;
 
-  if(name && email && password){
-  	user.signup(name, email, password)
+app.get('/home', function (req, res) {
+  if(sessions && sessions.username){
+    res.sendFile(__dirname + '/html/home.html');
   }
   else{
-  	res.send('Failure');
+    res.send('unauthorized');
   }
 })
+
+
+
 
 app.post('/addpost', function (req, res) {
   var title = req.body.title;
@@ -128,6 +145,9 @@ app.post('/getPostWithId', function(req,res){
   })
 }
 })
+socket.on('disconnect',function(){
+
+
 app.get('/logout', (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
         res.clearCookie('user_sid');
@@ -143,8 +163,11 @@ app.get('/logout', (req, res) => {
 	
     }
 });
+var online = Object.keys(io.engine.clients);
+io.emit('server_message',JSON.stringify(online));
+});
+});
 
-
-app.listen(7777,function(){
+server.listen(7777,function(){
     console.log("Started listening on port", 7777);
 })
