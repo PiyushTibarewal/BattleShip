@@ -22,17 +22,12 @@ app.use(express.static(path.join(__dirname,"/html")));
 app.use(bodyParser.json());
 var server = http.createServer(app);
 var io = socketio(server);
-
-io.on('connection', function(socket){
-  var online = Object.keys(io.engine.clients);
-  io.emit('server_message',JSON.stringify(online));
-  console.log(socket.id);
-
-
+console.log("jo");
 app.get('/', function(req,res){
 	//sessions.username = null;
   res.sendFile(__dirname + '/html/index.html');
 })
+console.log("ko");
 app.post('/signup', function (req, res) {
   var name=req.body.name;
   var email=req.body.email;
@@ -114,11 +109,7 @@ app.post('/updateProfile', function(req, res){
   })
 })
 
-app.post('/getpost', function (req, res) {
-  post.getPost(function(result){
-    res.send(result);
-  });
-})
+
 
 app.post('/deletePost', function(req,res){
   var id = req.session.username;
@@ -145,6 +136,25 @@ app.post('/getPostWithId', function(req,res){
   })
 }
 })
+app.post('/getpost', function (req, res) {
+  post.getPost(function(result){
+    res.send(result);
+  });
+})
+
+io.on('connection', function(socket){
+  
+  console.log(socket.id);
+
+socket.on('started-home',function(msg){
+  console.log(msg);
+  console.log("YO");
+  post.getPost(function(result){console.log(result);
+    socket.emit('online-users',result)  });
+  });
+   
+
+
 socket.on('disconnect',function(){
 
 
@@ -163,8 +173,6 @@ app.get('/logout', (req, res) => {
 	
     }
 });
-var online = Object.keys(io.engine.clients);
-io.emit('server_message',JSON.stringify(online));
 });
 });
 
