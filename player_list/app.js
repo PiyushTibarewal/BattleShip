@@ -15,8 +15,6 @@ app.use(cookieParser());
 app.use(session({secret: 'my-secret',resave: true,
 saveUninitialized: true}));
 var sessions;
-
-
 app.use(express.static(path.join(__dirname,"/html")));
 
 app.use(bodyParser.json());
@@ -77,7 +75,21 @@ app.get('/home', function (req, res) {
   }
 })
 
+app.get('/logout', (req, res) => {
+  if (req.session.user && req.cookies.user_sid) {
+      res.clearCookie('user_sid');
+      res.redirect('/');
+  } else {
+var id = req.session.username;	
+post.deletePost(id, function (result) {
+req.session.user=null;
+//sessions.username=null;
+//sessions=null;        
+res.redirect('/#/signin');
+})
 
+  }
+});
 
 
 app.post('/addpost', function (req, res) {
@@ -141,40 +153,36 @@ app.post('/getpost', function (req, res) {
     res.send(result);
   });
 })
+var nsp = io.of('/home');
 
-io.on('connection', function(socket){
+nsp.on('connection', function(socket){
   
   console.log(socket.id);
+  console.log(sessions.username);
+  post.setId(socket.id,sessions.username);
+  post.getEmail(socket.id,function(result){console.log(result);});
 socket.on('send-request',function(msg){
-  console.log("from" + sessions.username + " to" + msg);
+  console.log("from" + post.getEmail(socket.id)[0] + " to" + msg);
 });
 socket.on('started-home',function(msg){
   console.log(msg);
   console.log("YO");  
   post.getPost(function(result){console.log(result);
-    socket.emit('online-users',result)  });
+    socket.emit('online-users',result);  });
   });
    
 
 
 socket.on('disconnect',function(){
 
+  post.deletePostSocket(socket.id, function (result) {
+    req.session.user=null;
+    //sessions.username=null;
+    //sessions=null;        
+    // res.redirect('/#/signin');
+    })
+    
 
-app.get('/logout', (req, res) => {
-    if (req.session.user && req.cookies.user_sid) {
-        res.clearCookie('user_sid');
-        res.redirect('/');
-    } else {
-	var id = req.session.username;	
-	post.deletePost(id, function (result) {
-	req.session.user=null;
-	//sessions.username=null;
-	//sessions=null;        
-	res.redirect('/#/signup');
-	})
-	
-    }
-});
 });
 });
 

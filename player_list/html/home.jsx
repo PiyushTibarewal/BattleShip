@@ -3,7 +3,7 @@ var Route = window.ReactRouter.Route;
 var hashHistory = window.ReactRouter.hashHistory;
 var browserHistory = window.ReactRouter.browserHistory;
 var Link = window.ReactRouter.Link;
-const socket = io();
+var socket = io('/home');
 var show=null;
 class AddPost extends React.Component {
   constructor(props) {
@@ -178,7 +178,7 @@ class ShowPost extends React.Component {
     
     super(props); 
     this.updatePost = this.updatePost.bind(this);
-    this.deletePost = this.deletePost.bind(this);
+    // this.deletePost = this.deletePost.bind(this);
     // this.getPost = this.getPost.bind(this);
     this.state = {
       posts: [],
@@ -191,20 +191,20 @@ class ShowPost extends React.Component {
     socket.emit("send-request",username);
   }
 
-  deletePost(id) {
-    if (confirm('Are you sure ?')) {
-      var self = this;
-      axios.post('/deletePost', {
-        id: id
-      })
-        .then(function (response) {
+  // deletePost(id) {
+  //   if (confirm('Are you sure ?')) {
+  //     var self = this;
+  //     axios.post('/deletePost', {
+  //       id: id
+  //     })
+  //       .then(function (response) {
           
-        })
-        .catch(function (error) {
-          console.log('Error is ', error);
-        });
-    }
-  }
+  //       })
+  //       .catch(function (error) {
+  //         console.log('Error is ', error);
+  //       });
+  //   }
+  // }
 
   changePost(msg){
     this.setState({posts:msg});
@@ -261,7 +261,7 @@ socket.on('online-users',function(msg){
   console.log("HI");
   show.changePost(red);
   console.log(red);
-  console.log("HI");
+  console.log("HI");  
 }); 
 
 ReactDOM.render(

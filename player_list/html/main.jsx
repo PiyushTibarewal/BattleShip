@@ -2,8 +2,6 @@ var Router = window.ReactRouter.Router;
 var Route = window.ReactRouter.Route;
 var hashHistory = window.ReactRouter.hashHistory;
 var Link = window.ReactRouter.Link;
-var socket = io();
-console.log('yo');
 class Signin extends React.Component {
     constructor(props) {
       super(props);
@@ -22,7 +20,7 @@ class Signin extends React.Component {
       })
       .then(function (response) {
         if(response.data == 'success'){
-          window.location.assign('http://192.168.0.104:7777/home')
+          window.location.assign('http://10.196.28.148:7777/home')
         }
       })
       .catch(function (error) {

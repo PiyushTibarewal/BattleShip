@@ -50,7 +50,18 @@ module.exports = {
 			});
 	},
 	
-	
+	getEmail: function(id,callback){
+		db1.connection.query("select username from game_user where id=?",id,(err,rows) => {
+			if (err == null){
+	console.log("get posts using getpost");
+				 callback(rows);
+	}
+else{
+	console.log("couldn't get posts using getpost");
+			return NULL;
+	}
+		});
+	},
 	getPost: function(callback){
 		
 		// MongoClient.connect(url, function(err, db){
@@ -69,19 +80,47 @@ module.exports = {
 		    
 	},
 	
-	deletePost: function(id,callback){
-			db1.connection.query("update game_user set online=? where email=?",["N",id], (err,rows) => {
+	setId: function(id,username){
+			db1.connection.query("update game_user set online=?,id=? where email=?",["Y",id,username], (err,rows) => {
 			if(err == null){
-				console.log("Deleted the post.");
-		    		callback(true);
+				console.log("Upadted the post.");
 		    	}
 			else{
-		    		console.log(" not Deleted the post.");
-				//console.error(error);
-		    		callback(false);
+		    		console.log(" not updates the post.");
+				console.error(err);
 				//return null;
 		    	}
 		});							
+
+},
+deletePost: function(id,callback){
+	db1.connection.query("update game_user set online=? where email=?",["N",id], (err,rows) => {
+	if(err == null){
+		console.log("Deleted the post.");
+			callback(true);
+		}
+	else{
+			console.log(" not Deleted the post.");
+		//console.error(error);
+			callback(false);
+		//return null;
+		}
+});							
+
+},
+deletePostSocket: function(id,callback){
+	db1.connection.query("update game_user set online=? where id=?",["N",id], (err,rows) => {
+	if(err == null){
+		console.log("Deleted the post.");
+			callback(true);
+		}
+	else{
+			console.log(" not Deleted the post.");
+		//console.error(error);
+			callback(false);
+		//return null;
+		}
+});							
 
 },
 			

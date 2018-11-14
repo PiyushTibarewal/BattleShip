@@ -1,4 +1,4 @@
-var MongoClient = require('mongodb').MongoClient;
+// var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 //var url = 'mongodb://localhost:27017/Blog';
 const db1 = require('./db');
