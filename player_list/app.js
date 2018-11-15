@@ -85,7 +85,7 @@ post.deletePost(id, function (result) {
 req.session.user=null;
 //sessions.username=null;
 //sessions=null;        
-res.redirect('/#/signin');
+res.redirect('/#/signup');
 })
 
   }
@@ -168,15 +168,17 @@ socket.on('started-home',function(msg){
   console.log(msg);
   console.log("YO");  
   post.getPost(function(result){console.log(result);
-    socket.emit('online-users',result);  });
+    nsp.emit('online-users',result);  });
   });
    
 
 
 socket.on('disconnect',function(){
-
+  post.getPost(function(result){console.log(result);
+    nsp.emit('online-users',result);  });
+  
   post.deletePostSocket(socket.id, function (result) {
-    req.session.user=null;
+    // req.session.user=null;
     //sessions.username=null;
     //sessions=null;        
     // res.redirect('/#/signin');
