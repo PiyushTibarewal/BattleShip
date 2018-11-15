@@ -160,9 +160,16 @@ nsp.on('connection', function(socket){
   console.log(socket.id);
   console.log(sessions.username);
   post.setId(socket.id,sessions.username);
-  post.getEmail(socket.id,function(result){console.log(result);});
+  console.log("PIUID");
+  post.getEmail(function(result){
+    console.log(result);
+  });
+  
 socket.on('send-request',function(msg){
-  console.log("from" + post.getEmail(socket.id)[0] + " to" + msg);
+  post.getEmail(function(result){
+    console.log("from" + result + " to" + msg);
+  });
+  
 });
 socket.on('started-home',function(msg){
   console.log(msg);
@@ -174,18 +181,17 @@ socket.on('started-home',function(msg){
 
 
 socket.on('disconnect',function(){
-  post.getPost(function(result){console.log(result);
+    post.getPost(function(result){console.log(result);
     nsp.emit('online-users',result);  });
-  
+
   post.deletePostSocket(socket.id, function (result) {
     // req.session.user=null;
     //sessions.username=null;
     //sessions=null;        
     // res.redirect('/#/signin');
     })
-    
-
-});
+  });
+  
 });
 
 server.listen(7777,function(){

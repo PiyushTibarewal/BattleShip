@@ -54,7 +54,9 @@ module.exports = {
 		db1.connection.query("select username from game_user where id=?",id,(err,rows) => {
 			if (err == null){
 	console.log("get posts using getpost");
-				 callback(rows);
+	var result=JSON.stringify(rows);
+  var red=JSON.parse(result);
+				 callback(red[0]['username']);
 	}
 else{
 	console.log("couldn't get posts using getpost");
@@ -62,6 +64,35 @@ else{
 	}
 		});
 	},
+// getEmail: function(id){
+// 	db1.connection.query("select username from game_user where id=?",id,(err,rows) => {
+// 		if (err == null){
+// console.log("get posts using getpost");
+// var result=JSON.stringify(rows);
+// var red=JSON.parse(result);
+// 			 return red[0]['username'];
+// }
+// else{
+// console.log("couldn't get posts using getpost");
+// 		return NULL;
+// }
+// 	});
+// },
+	getId: function(username,callback){
+		db1.connection.query("select id from game_user where email=?",username,(err,rows) => {
+			if (err == null){
+	console.log("get posts using getpost");
+	var result=JSON.stringify(rows);
+  var red=JSON.parse(result);
+				 callback(red[0]['id']);
+	}
+else{
+	console.log("couldn't get posts using getpost");
+			return NULL;
+	}
+		});
+	},
+
 	getPost: function(callback){
 		
 		// MongoClient.connect(url, function(err, db){
