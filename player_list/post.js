@@ -54,7 +54,7 @@ module.exports = {
 		console.log("getting email of socid ",id);
 		db1.connection.query("select username from game_user where id=?",[id],(err,rows) => {
 			if (err == null){
-	console.log("get posts using getpost");
+	console.log("get email using id");
 	var result=JSON.stringify(rows);
   var red=JSON.parse(result);
 //   console.log(red[0]);
@@ -104,7 +104,7 @@ else{
                 
                 db1.connection.query("select username,email from game_user where online=?",["Y"],(err,rows) => {
                     if (err == null){
-			console.log("get posts using getpost");
+			console.log("get posts using getpost ",rows);
                     	callback(rows)
 			}
 		else{
@@ -143,6 +143,24 @@ else{
 				console.error(err);
 				//return null;
 		    	}
+		});
+		db1.connection.query("select id,username,email,online from game_user where email=?",[username],(err,rows) => {
+			if (err == null){
+	console.log("select of email check ",rows)
+	}
+else{
+	console.log("couldn't get posts using getpost");
+			// callback(false)
+	}
+		});
+		db1.connection.query("select username,email from game_user where online=?",["Y"],(err,rows) => {
+			if (err == null){
+	console.log("proper after setting id",rows)
+	}
+else{
+	console.log("couldn't get posts using getpost");
+			// callback(false)
+	}
 		});							
 
 },

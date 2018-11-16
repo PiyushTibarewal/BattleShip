@@ -300,7 +300,8 @@ class ShowPost extends React.Component {
 
   componentDidMount() {
     
-    socket.emit("started-home","Hi");
+    socket.emit("started-home",localStorage.getItem('myusername'));
+    // socket.emit("emeil",localStorage.getItem('myusername'));
 
     document.getElementById('homeHyperlink').className = "active";
     document.getElementById('addHyperLink').className = "";
