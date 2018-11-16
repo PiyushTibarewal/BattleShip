@@ -156,35 +156,42 @@ app.post('/getpost', function (req, res) {
 var nsp = io.of('/home');
 
 nsp.on('connection', function(socket){
-  
-  console.log(socket.id);
-  console.log(sessions.username);
-  post.setId(socket.id,sessions.username);
-  console.log("PIUID");
-  post.getEmail(function(result){
+  // console.log(socket.handshake.headers.cookie);
+  // console.log(socket.request.headers.cookie);
+  console.log("made connection with socid ",socket.id);
+  if(sessions!=undefined){
+    // sessions=req.session;
+    console.log("sessions defined with username:- ",sessions.username);
+  post.setId(socket.id,sessions.username);}
+  console.log("after setid call moving to getemail");
+  post.getEmail(socket.id,function(result){
     console.log(result);
+    console.log("my_test");
   });
   
 socket.on('send-request',function(msg){
-  post.getEmail(function(result){
-    console.log("from" + result + " to" + msg);
+  post.getEmail(socket.id,function(result){
+    console.log("from" + result + " to " + msg);
   });
   
 });
 socket.on('started-home',function(msg){
-  console.log(msg);
-  console.log("YO");  
-  post.getPost(function(result){console.log(result);
+  console.log("started home with this message- ",msg," -recieved");
+  // console.log("YO");  
+  post.getPost(function(result){console.log("started-home ",result);
+
     nsp.emit('online-users',result);  });
   });
    
 
 
 socket.on('disconnect',function(){
-    post.getPost(function(result){console.log(result);
+    post.getPost(function(result){console.log("disconnect",result);
     nsp.emit('online-users',result);  });
-
+      console.log("refresh-things");
   post.deletePostSocket(socket.id, function (result) {
+    console.log("post.deletepost ka result",result);
+    console.log("ho-jaye-yaar");
     // req.session.user=null;
     //sessions.username=null;
     //sessions=null;        

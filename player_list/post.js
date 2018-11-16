@@ -51,12 +51,16 @@ module.exports = {
 	},
 	
 	getEmail: function(id,callback){
-		db1.connection.query("select username from game_user where id=?",id,(err,rows) => {
+		console.log("getting email of socid ",id);
+		db1.connection.query("select username from game_user where id=?",[id],(err,rows) => {
 			if (err == null){
 	console.log("get posts using getpost");
 	var result=JSON.stringify(rows);
   var red=JSON.parse(result);
-				 callback(red[0]['username']);
+//   console.log(red[0]);
+  if (red[0]!=undefined)
+			 callback(red[0]['username']);
+	else callback(false);
 	}
 else{
 	console.log("couldn't get posts using getpost");
@@ -112,9 +116,10 @@ else{
 	},
 	
 	setId: function(id,username){
+		console.log("starting to set id of ",username," to ",id,"in sql request");
 			db1.connection.query("update game_user set online=?,id=? where email=?",["Y",id,username], (err,rows) => {
 			if(err == null){
-				console.log("Upadted the post.");
+				console.log("Upadted the post.  / setted id of ",username ,"to" ,id);
 		    	}
 			else{
 		    		console.log(" not updates the post.");
@@ -127,7 +132,7 @@ else{
 deletePost: function(id,callback){
 	db1.connection.query("update game_user set online=? where email=?",["N",id], (err,rows) => {
 	if(err == null){
-		console.log("Deleted the post.");
+		console.log("Deleted the post.",id);
 			callback(true);
 		}
 	else{
@@ -142,7 +147,7 @@ deletePost: function(id,callback){
 deletePostSocket: function(id,callback){
 	db1.connection.query("update game_user set online=? where id=?",["N",id], (err,rows) => {
 	if(err == null){
-		console.log("Deleted the post.");
+		console.log("Deleted the post_socket.",id);
 			callback(true);
 		}
 	else{
