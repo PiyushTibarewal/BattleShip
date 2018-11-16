@@ -114,6 +114,23 @@ else{
                 });
 		    
 	},
+	getLeaderBoard: function(callback){
+		
+		// MongoClient.connect(url, function(err, db){
+			//  db.collection('post', function (err, collection) {
+                
+                db1.connection.query("select username,email,games_played,games_won from game_user ORDER BY games_won",(err,rows) => {
+                    if (err == null){
+			console.log("get leaderboard using getLeaderBoard");
+                    	callback(rows)
+			}
+		else{
+			console.log("couldn't get posts using getpost");
+                    callback(false)
+			}
+                });
+		    
+	},
 	
 	setId: function(id,username){
 		console.log("starting to set id of ",username," to ",id,"in sql request");

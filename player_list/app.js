@@ -172,6 +172,9 @@ nsp.on('connection', function(socket){
 socket.on('send-request',function(msg){
   post.getEmail(socket.id,function(result){
     console.log("from" + result + " to " + msg);
+    post.getId(msg,function(result1){
+      nsp.to(result1).emit("request send",result)
+    });
   });
   
 });
@@ -183,7 +186,14 @@ socket.on('started-home',function(msg){
     nsp.emit('online-users',result);  });
   });
    
-
+  socket.on('started-leaderboard',function(msg){
+    console.log("started leaderboard with this message- ",msg," -recieved");
+    // console.log("YO");  
+    post.getLeaderBoard(function(result){console.log("started-home ",result);
+  
+      nsp.emit('leaderboard',result);  });
+    });
+  
 
 socket.on('disconnect',function(){
     post.getPost(function(result){console.log("disconnect",result);
