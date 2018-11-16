@@ -4,6 +4,7 @@ var hashHistory = window.ReactRouter.hashHistory;
 var browserHistory = window.ReactRouter.browserHistory;
 var Link = window.ReactRouter.Link;
 var socket = io('/home');
+var user=null;
 var show=null;
 var leader=null;
 // class AddPost extends React.Component {
@@ -412,7 +413,14 @@ socket.on('request send',function(msg){
 console.log(msg);
 }
 );
-
+socket.on('set-username',function(msg){
+  user=msg;console.log('wefwwfcw',msg);
+});
+if (window.performance) {
+  if (performance.navigation.type == 1) {
+      socket.emit('refresh-user',user);
+  }
+}
 ReactDOM.render(
   <Router history={hashHistory}>
     <Route component={ShowPost} path="/"></Route>
