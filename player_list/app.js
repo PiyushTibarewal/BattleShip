@@ -77,22 +77,6 @@ app.get('/home', function (req, res) {
   }
 })
 
-app.get('/logout', (req, res) => {
-  if (req.session.user && req.cookies.user_sid) {
-    res.clearCookie('user_sid');
-    res.redirect('/');
-  } else {
-    var id = req.session.username;
-    console.log('fetrgtrvwv ', id);
-    post.deletePost(id, function (result) {
-      req.session.user = null;
-      //sessions.username=null;
-      //sessions=null;        
-      res.redirect('/#/signup');
-    })
-
-  }
-});
 
 
 app.post('/addpost', function (req, res) {
@@ -214,6 +198,31 @@ nsp.on('connection', function (socket) {
   //   console.log("here it is",msg)
   // })
 
+  app.get('/logout', (req, res) => {
+    if (req.session.user && req.cookies.user_sid) {
+      res.clearCookie('user_sid');
+      res.redirect('/');
+    } else {
+      var id = req.session.username;
+      console.log('fetrgtrvwv ', id);
+      post.deletePostSocket(socket.id, function (result) {
+        console.log("post.deletepost ka result", result);
+        console.log("ho-jaye-yaar");
+        // req.session.user=null;
+        //sessions.username=null;
+        //sessions=null;        
+        // res.redirect('/#/signin');
+        res.redirect('/#/signup');
+      });
+      // post.deletePost(id, function (result) {
+      //   req.session.user = null;
+      //   //sessions.username=null;
+      //   //sessions=null;        
+        
+      // })
+  
+    }
+  });
 
   socket.on('disconnect', function () {
     
