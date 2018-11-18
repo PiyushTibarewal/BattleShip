@@ -65,6 +65,23 @@ module.exports = {
 
 	},
 
+	isPlaying: function (msg, callback) {
+
+		db1.connection.query("select is_playing,online from game_user where username=?", [msg], (err, rows) => {
+			var result = JSON.stringify(rows);
+			var red = JSON.parse(result);
+			var check = red[0]['is_playing'];
+			var online = red[0]['online'];
+			if (check == "Y" && online == "Y") {
+				callback(true);
+			}
+			else {
+				callback(false);
+			}
+		});
+
+	},
+
 	setId: function (id, username) {
 		console.log("starting to set id of ", username, " to ", id, "in sql request");
 		db1.connection.query("update game_user set online=?,id=? where username=?", ["Y", id, username], (err, rows) => {

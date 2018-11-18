@@ -29,11 +29,11 @@ app.get('/', function (req, res) {
 app.post('/signup', function (req, res) {
   var username = req.body.username;
   var password = req.body.password;
- 
+
   if (username && password) {
     user.signup(username, password, function (result) {
       if (result)
-        res.redirect('/');
+        res.redirect('/#/');
     })
   }
   else {
@@ -67,7 +67,7 @@ app.get('/home', function (req, res) {
 var nsp = io.of('/home');
 
 nsp.on('connection', function (socket) {
- 
+
   console.log("made connection with socket id ", socket.id)
 
   socket.on('send-request', function (msg) {
@@ -103,7 +103,21 @@ nsp.on('connection', function (socket) {
       nsp.emit('leaderboard', result);
     });
   });
-
+  socket.on('challenge-accepted', function (msg) {
+    socket.emit('start-game', msg);
+    post.getId(msg, function (result) {
+      post.getUsername(socket.id, function (result2) { nsp.to(result).emit("start-game", result2); });
+    });
+  });
+  socket.on('challenge-declined', function (msg) {
+    post.getId(msg, function (result) {
+      post.isPlaying(msg, function (result1) {
+        if (!result1)
+          post.getUsername(socket.id, function (result2) { nsp.to(result).emit("request declined sendby", result2); });
+      });
+    });
+    socket.emit("request declined sendto");
+  });
   app.get('/logout', (req, res) => {
 
     res.redirect('/#/');
