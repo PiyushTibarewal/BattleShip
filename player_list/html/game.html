@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>tables sideXside</title>
+       <style>
+
+     table, td 
+                {
+                border-color: #000000; 
+                          border-width: 1px; 
+                          border-style: solid; 
+                          border-collapse: collapse;
+                          font-family: Arial; 
+                          font-size: 14pt; 
+                          font-weight: 500;
+                          }
+
+     td 
+       {
+         color: #000000; 
+         text-align: center;
+         padding: 10px 10px 10px 10px
+         }
+
+      .sidexside 
+       {
+             float: left;
+             margin:20px;
+             valign: top;
+             }
+
+       </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('#submit').click(function(){
+        var r = document.getElementById("r").value ;
+        var c = document.getElementById("c").value;
+        var ta = document.getElementById("t").value;
+        var colour=document.getElementById("colour").value;
+        var v=Number((8*r)) + Number(c);
+        var cell = $("#"+ta).find("td").eq(v); // or $("#Table").find("td").eq(4);
+        cell.css("background-color",colour);
+    });
+
+    $('td').click(function(){
+  var col = $(this).parent().children().index($(this));
+  var row = $(this).parent().parent().children().index($(this).parent());
+  alert('Row: ' + row + ', Column: ' + col);
+}); 
+
+});
+
+</script>
+
+</head>
+<body>
+
+     <table summary="" width="40%" height="40%" class="sidexside" id="user">
+
+     <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
+     <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+     </table>
+     <table summary="" width="40%" height="40%" class="sidexside" id="opponent">
+
+        <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+
+        <input type="number" id="r">Row
+        <input type="number" id="c">column
+        <input type="text" id="colour">colour
+        <input type="text" id='t'>table_number
+        <button id="submit"> submit</button>
+
+</body>
+</html>
