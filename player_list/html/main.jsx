@@ -21,7 +21,7 @@ class Signin extends React.Component {
       .then(function (response) {
         if (response.data) {
           localStorage.setItem('myusername', response.data);
-          window.location.assign('http://192.168.1.104:7777/home');
+          window.location.assign('http://10.196.6.163:7777/home');
         }
       })
       .catch(function (error) {

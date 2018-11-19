@@ -21,7 +21,6 @@ class ShowProfile extends React.Component {
       password: '',
       id: ''
     };
-    show = this;
 
   }
   componentDidMount() {
@@ -213,10 +212,18 @@ class challengeRequest extends React.Component {
   constructor(props) {
 
     super(props);
-    this.updatePost = this.updatePost.bind(this);
-    
+    this.state = {
+      username: null,
+    };
+    challenge=this;
+    console.log("vrefc");
     // var username = this.props.username;
-      }
+  }
+
+  updateUsername(msg) {
+    this.setState({ username: msg });
+  }
+
   yes() {
     socket.emit('challenge-accepted', this.props.username);
   }
@@ -266,15 +273,22 @@ socket.on('leaderboard', function (msg) {
 const element = <h1>Hello, world</h1>;
 
 socket.on('request send', function (msg) {
-  ReactDOM.render(<challengeRequest username={msg} />, document.getElementById('app'));
-}
-);
+  console.log(msg);
+  ReactDOM.render(
+    <Router history={hashHistory}>
+      <Route component={challengeRequest} username={msg} path="/"></Route>
+      <Route component={LeaderBoard} path="/addPost(/:id)"></Route>
+      <Route component={ShowProfile} path="/showProfile"></Route>
+    </Router>,
+    document.getElementById('app'));
+});
+
 socket.on('start-game', function (msg) {
   ReactDOM.render(element, document.getElementById('app'));
 }
 );
 
-socket.on('request declined sendto'),function() {
+socket.on('request declined sendto'), function () {
   ReactDOM.render(
     <Router history={hashHistory}>
       <Route component={ActivePlayers} path="/"></Route>
@@ -297,6 +311,7 @@ if (window.performance) {
     socket.emit('refresh-user', user);
   }
 }
+
 
 ReactDOM.render(
   <Router history={hashHistory}>
