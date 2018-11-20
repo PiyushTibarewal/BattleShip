@@ -283,6 +283,7 @@ class Board extends React.Component {
         console.log("Chance played emit");
         if (name == 'user') {
           socket.emit("chance_played", { table: user_name, i: r, j: c });
+          document.getElementById('turn').innerHTML="Opponent's turn";
         }
         else {
           socket.emit("chance_played", { table: opponent_name, i: r, j: c });
@@ -299,6 +300,7 @@ class Board extends React.Component {
         if (tb == 'user') {
           var cell1 = $('#user').find("td").eq(v1);console.log(cell1);
           cell1.css("background-color", "red");
+          document.getElementById('turn').innerHTML="Your's turn";
         }
         if (tb == 'opponent') {
           var cell1 = $('#opponnet').find("td").eq(v1);
@@ -316,7 +318,11 @@ class Board extends React.Component {
   render() {
     return (
       <div className="App">
-
+      <div class="card">
+          <div class="container">
+            <p id="turn"></p>
+          </div>
+        </div>
         <table summary="" width="40%" height="40%" class="sidexside" id="user">
           <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
           <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
