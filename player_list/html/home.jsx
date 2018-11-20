@@ -4,10 +4,12 @@ var hashHistory = window.ReactRouter.hashHistory;
 var browserHistory = window.ReactRouter.browserHistory;
 var Link = window.ReactRouter.Link;
 var socket = io('/home');
-var user = null;
+var user_name = null;
 var show = null;
 var leader = null;
-var challenge = null;
+var opponent_name = null;
+var is_playing = 1;
+// import $ from 'jquery';
 class ShowProfile extends React.Component {
   constructor(props) {
     super(props);
@@ -78,11 +80,9 @@ class ShowProfile extends React.Component {
             <div className="form-group">
               <input value={this.state.name} type="text" onChange={this.handleNameChange} className="form-control" placeholder="Name" required />
             </div>
-
             <div className="form-group">
               <input value={this.state.password} type="password" onChange={this.handlePasswordChange} className="form-control" placeholder="Password" required />
             </div>
-
             <button type="button" onClick={this.updateProfile} id="submit" name="submit" className="btn btn-primary pull-right">Update</button>
           </form>
         </div>
@@ -208,20 +208,15 @@ class ActivePlayers extends React.Component {
   }
 };
 
-class challengeRequest extends React.Component {
+class ChallengeRequest extends React.Component {
   constructor(props) {
 
     super(props);
     this.state = {
-      username: null,
+      username: '',
     };
-    challenge=this;
-    console.log("vrefc");
-    // var username = this.props.username;
-  }
-
-  updateUsername(msg) {
-    this.setState({ username: msg });
+    this.yes = this.yes.bind(this);
+    this.no = this.no.bind(this);
   }
 
   yes() {
@@ -231,26 +226,133 @@ class challengeRequest extends React.Component {
     socket.emit('challenge-declined', this.props.username);
   }
 
-
-  componentDidMount() {
-
-    document.getElementById('homeHyperlink').className = "active";
-    document.getElementById('addHyperLink').className = "";
-    document.getElementById('profileHyperlink').className = "";
-  }
-
   render() {
 
     return (
       <div>
         <h2>{this.props.username} thinks he can defeat you. Do you accept his challenge.</h2>
-        <button type="button" onClick={yes} id="submit" name="submit" className="btn btn-primary pull-right">Yes</button>
-        <button type="button" onClick={no} id="submit" name="submit" className="btn btn-primary pull-right">No</button>
+        <button type="button" onClick={this.yes} id="submit" name="submit" className="btn btn-primary pull-right">Yes</button>
+        <button type="button" onClick={this.no} id="submit" name="submit" className="btn btn-primary pull-right">No</button>
       </div>
-
     )
   }
 };
+class Board extends React.Component {
+  componentDidMount() {
+    $('td').click(function () {
+      var name = $(this).closest('table').attr('id');
+
+      var c = $(this).parent().children().index($(this));
+      var r = $(this).parent().parent().children().index($(this).parent());
+      if (is_playing == 0) {
+        var a = document.getElementById("shape").selectedIndex;
+        var b = document.getElementById("h_or_v").selectedIndex;
+        if (name == 'user') {
+          socket.emit("shape_select", { table: user_name, i: r, j: c, shape: a, h_or_v: b });
+        }
+        else {
+          socket.emit("shape_select", { table: opponent_name, i: r, j: c, shape: a, h_or_v: b });
+        }
+
+      }
+      socket.on("configure_shape", function (msg) {
+        if (msg['table'] == 'user') {
+          var n = msg['num_points'];
+          for (i = 0; i < n; i++) {
+            r1 = msg['i' + i];
+            c1 = msg['j' + i];
+            var v = Number((8 * r1)) + Number(c1);
+            // socket.emit("chance_palyed", { r: r, c: c, opp: "opponent" });
+            var cell = $("#opponent").find("td").eq(v); // or $("#Table").find("td").eq(4);
+            cell.css("background-color", "red");
+          }
+        }
+        if (msg['table'] == 'opponent') {
+          var n = msg['num_points'];
+          for (i = 0; i < n; i++) {
+            r1 = msg['i' + i];
+            c1 = msg['j' + i];
+            var v = Number((8 * r1)) + Number(c1);
+            var cell = $("#user").find("td").eq(v); // or $("#Table").find("td").eq(4);
+            cell.css("background-color", "blue");
+          }
+        }
+      });
+      //emit when clicking at i,j 
+      if (is_playing == 1) {
+        console.log("Chance played emit");
+        if (name == 'user') {
+          socket.emit("chance_played", { table: user_name, i: r, j: c });
+        }
+        else {
+          socket.emit("chance_played", { table: opponent_name, i: r, j: c });
+        };
+      }
+      //for changing the colour when chance is played;
+     });
+      socket.on("colour_change", function (msg) {
+        console.log(msg);console.log("GERG");
+        var tb = msg['table'];
+        var r2 = msg['i'];
+        var c2 = msg['j'];
+        var v1 = Number((8 * r2)) + Number(c2);console.log(v1);
+        if (tb == 'user') {
+          var cell1 = $('#user').find("td").eq(v1);console.log(cell1);
+          cell1.css("background-color", "red");
+        }
+        if (tb == 'opponent') {
+          var cell1 = $('#opponnet').find("td").eq(v1);
+          cell1.css("background-color", "blue");
+        }
+      });
+    }
+    //   $('#try_it').click(function() {
+    //     var a = document.getElementById("shape").selectedIndex ;
+    //     var b = document.getElementById("h_or_v").selectedIndex
+    //   document.getElementById("para").innerHTML=a + " and " + b;
+    // });
+
+  
+  render() {
+    return (
+      <div className="App">
+
+        <table summary="" width="40%" height="40%" class="sidexside" id="user">
+          <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <table summary="" width="40%" height="40%" class="sidexside" id="opponent">
+          <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <p id="para"></p>
+        <select id="shape">
+          <option>Apple</option>
+          <option>Orange</option>
+          <option>Pineapple</option>
+          <option>Banana</option>
+        </select>
+        <select id="h_or_v">
+          <option>horizontal</option>
+          <option>vertical</option>
+        </select>
+        <button id="try_it">Try it</button>
+      </div>
+    );
+  }
+}
 
 socket.on('online-users', function (msg) {
   var result = JSON.stringify(msg);
@@ -273,20 +375,15 @@ socket.on('leaderboard', function (msg) {
 const element = <h1>Hello, world</h1>;
 
 socket.on('request send', function (msg) {
-  console.log(msg);
-  ReactDOM.render(
-    <Router history={hashHistory}>
-      <Route component={challengeRequest} username={msg} path="/"></Route>
-      <Route component={LeaderBoard} path="/addPost(/:id)"></Route>
-      <Route component={ShowProfile} path="/showProfile"></Route>
-    </Router>,
-    document.getElementById('app'));
+  ReactDOM.render(<ChallengeRequest username={msg} />,
+    document.getElementById('root'));
 });
 
+
 socket.on('start-game', function (msg) {
-  ReactDOM.render(element, document.getElementById('app'));
-}
-);
+  opponent_name = msg;
+  ReactDOM.render(<Board />, document.getElementById('root'));
+});
 
 socket.on('request declined sendto'), function () {
   ReactDOM.render(
@@ -303,12 +400,12 @@ socket.on('request declined sendby', function (msg) {
 });
 
 socket.on('set-username', function (msg) {
-  user = msg; console.log('wefwwfcw', msg);
+  user_name = msg; console.log('wefwwfcw', msg);
 });
 
 if (window.performance) {
   if (performance.navigation.type == 1) {
-    socket.emit('refresh-user', user);
+    socket.emit('refresh-user', user_name);
   }
 }
 
