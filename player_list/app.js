@@ -123,6 +123,12 @@ nsp.on('connection', function (socket) {
     res.redirect('/#/');
   }
   );
+  socket.on('chance_played',function(msg){
+    console.log(msg);
+    post.getId(msg['table'], function (result) {console.log({ table: 'user', i: msg['i'], j: msg['j']});
+      nsp.to(result).emit('colour_change',{ table: 'user', i: msg['i'], j: msg['j']});
+    });
+  });
 
   socket.on('disconnect', function () {
 

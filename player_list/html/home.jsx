@@ -4,11 +4,11 @@ var hashHistory = window.ReactRouter.hashHistory;
 var browserHistory = window.ReactRouter.browserHistory;
 var Link = window.ReactRouter.Link;
 var socket = io('/home');
-var user = null;
+var user_name = null;
 var show = null;
 var leader = null;
-var opponent = null;
-var is_playing= 0;
+var opponent_name = null;
+var is_playing = 1;
 // import $ from 'jquery';
 class ShowProfile extends React.Component {
   constructor(props) {
@@ -241,64 +241,78 @@ class Board extends React.Component {
   componentDidMount() {
     $('td').click(function () {
       var name = $(this).closest('table').attr('id');
+
       var c = $(this).parent().children().index($(this));
       var r = $(this).parent().parent().children().index($(this).parent());
-      if (is_playing == 0){
-        var a = document.getElementById("shape").selectedIndex ;
-      var b = document.getElementById("h_or_v").selectedIndex;
-      socket.emit("shape_select",{user: name, i: r, j: c,shape: a,h_or_v: b});
+      if (is_playing == 0) {
+        var a = document.getElementById("shape").selectedIndex;
+        var b = document.getElementById("h_or_v").selectedIndex;
+        if (name == 'user') {
+          socket.emit("shape_select", { table: user_name, i: r, j: c, shape: a, h_or_v: b });
+        }
+        else {
+          socket.emit("shape_select", { table: opponent_name, i: r, j: c, shape: a, h_or_v: b });
+        }
+
       }
-      socket.on("configure_shape",function(msg) {
-        if (msg['name'] == "user") {
-          var n=msg['num_points'];
-          for(i = 0;i<n ; i++){
-            r1=msg['i'+i];
-            c1=msg['j'+i];
-          var v = Number((8 * r1)) + Number(c1);
-          // socket.emit("chance_palyed", { r: r, c: c, opp: "opponent" });
-          var cell = $("#opponent").find("td").eq(v); // or $("#Table").find("td").eq(4);
-          cell.css("background-color", "red");
+      socket.on("configure_shape", function (msg) {
+        if (msg['table'] == 'user') {
+          var n = msg['num_points'];
+          for (i = 0; i < n; i++) {
+            r1 = msg['i' + i];
+            c1 = msg['j' + i];
+            var v = Number((8 * r1)) + Number(c1);
+            // socket.emit("chance_palyed", { r: r, c: c, opp: "opponent" });
+            var cell = $("#opponent").find("td").eq(v); // or $("#Table").find("td").eq(4);
+            cell.css("background-color", "red");
           }
         }
-        if (msg['name'] == "opponent") {
+        if (msg['table'] == 'opponent') {
           var n = msg['num_points'];
-          for(i=0;i<n;i++){
-            r1=msg['i'+i];
-            c1=msg['j'+i];
+          for (i = 0; i < n; i++) {
+            r1 = msg['i' + i];
+            c1 = msg['j' + i];
             var v = Number((8 * r1)) + Number(c1);
-          var cell = $("#user").find("td").eq(v); // or $("#Table").find("td").eq(4);
-          cell.css("background-color", "blue");
+            var cell = $("#user").find("td").eq(v); // or $("#Table").find("td").eq(4);
+            cell.css("background-color", "blue");
           }
         }
       });
       //emit when clicking at i,j 
-      if(is_playing == 1){
-        socket.emit("chance_played",{user: name, i:r,j:c});
+      if (is_playing == 1) {
+        console.log("Chance played emit");
+        if (name == 'user') {
+          socket.emit("chance_played", { table: user_name, i: r, j: c });
+        }
+        else {
+          socket.emit("chance_played", { table: opponent_name, i: r, j: c });
+        };
       }
       //for changing the colour when chance is played;
-      socket.on("colour_change",function (msg){
-        tb=msg['table'];
-        r2=msg['i'];
-        c2=msg['j'];
-        var v1=Number((8 * r2)) + Number(c2);
-        if (tb=='user'){
-          var cell1 =$('#user').find("td").eq(v1);
-          cell1.css("background-colour", "red");
+     });
+      socket.on("colour_change", function (msg) {
+        console.log(msg);console.log("GERG");
+        var tb = msg['table'];
+        var r2 = msg['i'];
+        var c2 = msg['j'];
+        var v1 = Number((8 * r2)) + Number(c2);console.log(v1);
+        if (tb == 'user') {
+          var cell1 = $('#user').find("td").eq(v1);console.log(cell1);
+          cell1.css("background-color", "red");
         }
-        if(tb='opponent'){
-          var cell1=$('#opponenet').find("td").eq(v1);
-          cell1.css("background-colour","blue");
+        if (tb == 'opponent') {
+          var cell1 = $('#opponnet').find("td").eq(v1);
+          cell1.css("background-color", "blue");
         }
       });
-      
-    })
-  //   $('#try_it').click(function() {
-  //     var a = document.getElementById("shape").selectedIndex ;
-  //     var b = document.getElementById("h_or_v").selectedIndex
-  //   document.getElementById("para").innerHTML=a + " and " + b;
-  // });
+    }
+    //   $('#try_it').click(function() {
+    //     var a = document.getElementById("shape").selectedIndex ;
+    //     var b = document.getElementById("h_or_v").selectedIndex
+    //   document.getElementById("para").innerHTML=a + " and " + b;
+    // });
 
-  }
+  
   render() {
     return (
       <div className="App">
@@ -325,16 +339,16 @@ class Board extends React.Component {
         </table>
         <p id="para"></p>
         <select id="shape">
-  <option>Apple</option>
-  <option>Orange</option>
-  <option>Pineapple</option>
-  <option>Banana</option>
-</select>
-<select id="h_or_v">
-  <option>horizontal</option>
-  <option>vertical</option>
-</select>
-<button id="try_it">Try it</button>
+          <option>Apple</option>
+          <option>Orange</option>
+          <option>Pineapple</option>
+          <option>Banana</option>
+        </select>
+        <select id="h_or_v">
+          <option>horizontal</option>
+          <option>vertical</option>
+        </select>
+        <button id="try_it">Try it</button>
       </div>
     );
   }
@@ -367,8 +381,9 @@ socket.on('request send', function (msg) {
 
 
 socket.on('start-game', function (msg) {
-  opponent=msg;
-  ReactDOM.render(<Board />, document.getElementById('root'));});
+  opponent_name = msg;
+  ReactDOM.render(<Board />, document.getElementById('root'));
+});
 
 socket.on('request declined sendto'), function () {
   ReactDOM.render(
@@ -385,12 +400,12 @@ socket.on('request declined sendby', function (msg) {
 });
 
 socket.on('set-username', function (msg) {
-  user = msg; console.log('wefwwfcw', msg);
+  user_name = msg; console.log('wefwwfcw', msg);
 });
 
 if (window.performance) {
   if (performance.navigation.type == 1) {
-    socket.emit('refresh-user', user);
+    socket.emit('refresh-user', user_name);
   }
 }
 
