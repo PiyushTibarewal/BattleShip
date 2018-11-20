@@ -245,64 +245,44 @@ class Board extends React.Component {
       var c = $(this).parent().children().index($(this));
       var r = $(this).parent().parent().children().index($(this).parent());
       if (is_playing == 0) {
-        var a = document.getElementById("shape").selectedIndex;
-        var b = document.getElementById("h_or_v").selectedIndex;
+        var a = document.getElementById("shape").selectedIndex.text;
+        var b = document.getElementById("h_or_v").selectedIndex.text;
         if (name == 'user') {
-          socket.emit("shape_select", { table: user_name, i: r, j: c, shape: a, h_or_v: b });
+          socket.emit("shape_select", { user: user_name,opponent: opponent_name, i: Number(r)+1, j: Number(c)+1, shape: a, h_or_v: b });
         }
-        else {
-          socket.emit("shape_select", { table: opponent_name, i: r, j: c, shape: a, h_or_v: b });
-        }
+        // else {
+          // socket.emit("shape_select", { table: opponent_name, i: r, j: c, shape: a, h_or_v: b });
+        // }
 
       }
-      socket.on("configure_shape", function (msg) {
-        if (msg['table'] == 'user') {
-          var n = msg['num_points'];
-          for (i = 0; i < n; i++) {
-            r1 = msg['i' + i];
-            c1 = msg['j' + i];
-            var v = Number((8 * r1)) + Number(c1);
-            // socket.emit("chance_palyed", { r: r, c: c, opp: "opponent" });
-            var cell = $("#opponent").find("td").eq(v); // or $("#Table").find("td").eq(4);
-            cell.css("background-color", "red");
-          }
-        }
-        if (msg['table'] == 'opponent') {
-          var n = msg['num_points'];
-          for (i = 0; i < n; i++) {
-            r1 = msg['i' + i];
-            c1 = msg['j' + i];
-            var v = Number((8 * r1)) + Number(c1);
-            var cell = $("#user").find("td").eq(v); // or $("#Table").find("td").eq(4);
-            cell.css("background-color", "blue");
-          }
-        }
-      });
       //emit when clicking at i,j 
       if (is_playing == 1) {
         console.log("Chance played emit");
         if (name == 'user') {
-          socket.emit("chance_played", { table: user_name, i: r, j: c });
+          // socket.emit("chance_played", { table: user_name, i: r, j: c });
         }
         else {
-          socket.emit("chance_played", { table: opponent_name, i: r, j: c });
+          socket.emit("chance_played", { user: user_name,opponent: opponent_name, i: Number(r)+1, j: Number(c)+1 });
         };
       }
       //for changing the colour when chance is played;
      });
+
       socket.on("colour_change", function (msg) {
         console.log(msg);console.log("GERG");
         var tb = msg['table'];
-        var r2 = msg['i'];
-        var c2 = msg['j'];
+        var r = msg['i'];
+        var c = msg['j'];
+        var r2 = Number(r)+1;
+        var c2 = Number(c)+1;
         var v1 = Number((8 * r2)) + Number(c2);console.log(v1);
         if (tb == 'user') {
           var cell1 = $('#user').find("td").eq(v1);console.log(cell1);
-          cell1.css("background-color", "red");
+          cell1.css("background-color", msg['color']);
         }
         if (tb == 'opponent') {
           var cell1 = $('#opponnet').find("td").eq(v1);
-          cell1.css("background-color", "blue");
+          cell1.css("background-color", msg['color']);
         }
       });
     }
