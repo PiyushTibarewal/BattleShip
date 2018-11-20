@@ -104,7 +104,7 @@ nsp.on('connection', function (socket) {
     });
   });
   socket.on('challenge-accepted', function (msg) {
-    socket.emit('start-game', msg);
+    nsp.to(socket.id).emit('start-game', msg);
     post.getId(msg, function (result) {
       post.getUsername(socket.id, function (result2) { nsp.to(result).emit("start-game", result2); });
     });
@@ -116,7 +116,7 @@ nsp.on('connection', function (socket) {
           post.getUsername(socket.id, function (result2) { nsp.to(result).emit("request declined sendby", result2); });
       });
     });
-    socket.emit("request declined sendto");
+    nsp.to(socket.id).emit("request declined sendto");
   });
   app.get('/logout', (req, res) => {
 

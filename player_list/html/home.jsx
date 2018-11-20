@@ -7,7 +7,7 @@ var socket = io('/home');
 var user = null;
 var show = null;
 var leader = null;
-var challenge = null;
+var opponent = null;
 // import $ from 'jquery';
 class ShowProfile extends React.Component {
   constructor(props) {
@@ -79,11 +79,9 @@ class ShowProfile extends React.Component {
             <div className="form-group">
               <input value={this.state.name} type="text" onChange={this.handleNameChange} className="form-control" placeholder="Name" required />
             </div>
-
             <div className="form-group">
               <input value={this.state.password} type="password" onChange={this.handlePasswordChange} className="form-control" placeholder="Password" required />
             </div>
-
             <button type="button" onClick={this.updateProfile} id="submit" name="submit" className="btn btn-primary pull-right">Update</button>
           </form>
         </div>
@@ -209,123 +207,80 @@ class ActivePlayers extends React.Component {
   }
 };
 
-class challengeRequest extends React.Component {
-  constructor() {
+class ChallengeRequest extends React.Component {
+  constructor(props) {
 
-    super();
+    super(props);
     this.state = {
-      username: 'my_user',
+      username: '',
     };
-    challenge=this;
-    console.log("vrefc");
-    // var username = this.props.username;
-  }
-
-  updateUsername(msg) {
-    this.setState({ username: msg });
+    this.yes = this.yes.bind(this);
+    this.no = this.no.bind(this);
   }
 
   yes() {
-    socket.emit('challenge-accepted', this.state.username);
+    socket.emit('challenge-accepted', this.props.username);
   }
   no() {
-    socket.emit('challenge-declined', this.state.username);
+    socket.emit('challenge-declined', this.props.username);
   }
-
-
-  // componentDidMount() {
-
-    // document.getElementById('homeHyperlink').className = "active";
-    // document.getElementById('addHyperLink').className = "";
-    // document.getElementById('profileHyperlink').className = "";
-  // }
 
   render() {
 
     return (
       <div>
-        <h2>{this.state.username} thinks he can defeat you. Do you accept his challenge.</h2>
-        <button type="button" onClick={yes} id="submit" name="submit" className="btn btn-primary pull-right">Yes</button>
-        <button type="button" onClick={no} id="submit" name="submit" className="btn btn-primary pull-right">No</button>
+        <h2>{this.props.username} thinks he can defeat you. Do you accept his challenge.</h2>
+        <button type="button" onClick={this.yes} id="submit" name="submit" className="btn btn-primary pull-right">Yes</button>
+        <button type="button" onClick={this.no} id="submit" name="submit" className="btn btn-primary pull-right">No</button>
       </div>
-
     )
   }
 };
 class Board extends React.Component {
-  componentDidMount(){
-    // $('#submit').click(function(){
-    //           var r = document.getElementById("r").value ;
-    //           var c = document.getElementById("c").value;
-    //           var ta = document.getElementById("t").value;
-    //           var colour=document.getElementById("colour").value;
-    //           var v=Number((8*r)) + Number(c);
-    //           var cell = $("#"+ta).find("td").eq(v); // or $("#Table").find("td").eq(4);
-    //           cell.css("background-color",colour);
-    //       })
-      
-          $('td').click(function(){
-            var name=$(this).closest('table').attr('id');
-        var c = $(this).parent().children().index($(this));
-        var r = $(this).parent().parent().children().index($(this).parent());
-        // alert('Row: ' + r + ', Column: ' + c);
-        if(name == "user"){
-          var v=Number((8*r)) + Number(c);
-          socket.emit("chance_palyed",{r: r, c: c, opp: "opponent"});
-          var cell = $("#opponent").find("td").eq(v); // or $("#Table").find("td").eq(4);
-              cell.css("background-color","red");
-        }
-        if(name == "opponent"){
-          var v=Number((8*r)) + Number(c);
-          var cell = $("#user").find("td").eq(v); // or $("#Table").find("td").eq(4);
-              cell.css("background-color","blue");
-        }
-      })
-      
+  componentDidMount() {
+    $('td').click(function () {
+      var name = $(this).closest('table').attr('id');
+      var c = $(this).parent().children().index($(this));
+      var r = $(this).parent().parent().children().index($(this).parent());
+      if (name == "user") {
+        var v = Number((8 * r)) + Number(c);
+        socket.emit("chance_palyed", { r: r, c: c, opp: "opponent" });
+        var cell = $("#opponent").find("td").eq(v); // or $("#Table").find("td").eq(4);
+        cell.css("background-color", "red");
+      }
+      if (name == "opponent") {
+        var v = Number((8 * r)) + Number(c);
+        var cell = $("#user").find("td").eq(v); // or $("#Table").find("td").eq(4);
+        cell.css("background-color", "blue");
+      }
+    })
+
   }
   render() {
     return (
       <div className="App">
-        {/* <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header> */}
+
         <table summary="" width="40%" height="40%" class="sidexside" id="user">
-            <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
-     <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                </table>
-                <table summary="" width="40%" height="40%" class="sidexside" id="opponent">
-                <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                </table>
-         {/* <input type="number" id="r" />Row
-        <input type="number" id="c" />column
-        <input type="text" id="colour" />colour
-        <input type="text" id='t' />table_number
-        <button id="submit"> submit</button>  */}
-      </div> 
+          <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <table summary="" width="40%" height="40%" class="sidexside" id="opponent">
+          <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+      </div>
     );
   }
 }
@@ -351,26 +306,14 @@ socket.on('leaderboard', function (msg) {
 const element = <h1>Hello, world</h1>;
 
 socket.on('request send', function (msg) {
-  console.log(msg);
-   function tick (msg)  {
-    const element = (
-      <div>
-        <h2>{ msg } thinks he can defeat you. Do you accept his challenge.</h2>
-        <button type="button" onClick={ socket.emit('challenge-accepted', msg)} id="submit" name="submit" className="btn btn-primary pull-right">Yes</button>
-        <button type="button" onClick={  socket.emit('challenge-declined', msg) } id="submit" name="submit" className="btn btn-primary pull-right">No</button>
-      </div>
-    );
-    ReactDOM.render(element,document.getElementById('root'));
-  }
-  var fdk = tick(msg);
-  // ReactDOM.render(<challengeRequest />, 
-  //   document.getElementById('root'));
+  ReactDOM.render(<ChallengeRequest username={msg} />,
+    document.getElementById('root'));
 });
 
+
 socket.on('start-game', function (msg) {
-  ReactDOM.render(<Board />, document.getElementById('app'));
-}
-);
+  opponent=msg;
+  ReactDOM.render(<Board />, document.getElementById('root'));});
 
 socket.on('request declined sendto'), function () {
   ReactDOM.render(
@@ -404,7 +347,3 @@ ReactDOM.render(
     <Route component={ShowProfile} path="/showProfile"></Route>
   </Router>,
   document.getElementById('app'));
-// export default ShowProfile;
-// export default LeaderBoard;
-// export default ActivePlayers;
-// export default challengeRequest;
