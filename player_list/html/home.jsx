@@ -8,6 +8,7 @@ var user = null;
 var show = null;
 var leader = null;
 var opponent = null;
+var is_playing= 0;
 // import $ from 'jquery';
 class ShowProfile extends React.Component {
   constructor(props) {
@@ -242,18 +243,60 @@ class Board extends React.Component {
       var name = $(this).closest('table').attr('id');
       var c = $(this).parent().children().index($(this));
       var r = $(this).parent().parent().children().index($(this).parent());
-      if (name == "user") {
-        var v = Number((8 * r)) + Number(c);
-        socket.emit("chance_palyed", { r: r, c: c, opp: "opponent" });
-        var cell = $("#opponent").find("td").eq(v); // or $("#Table").find("td").eq(4);
-        cell.css("background-color", "red");
+      if (is_playing == 0){
+        var a = document.getElementById("shape").selectedIndex ;
+      var b = document.getElementById("h_or_v").selectedIndex;
+      socket.emit("shape_select",{user: name, i: r, j: c,shape: a,h_or_v: b});
       }
-      if (name == "opponent") {
-        var v = Number((8 * r)) + Number(c);
-        var cell = $("#user").find("td").eq(v); // or $("#Table").find("td").eq(4);
-        cell.css("background-color", "blue");
+      socket.on("configure_shape",function(msg) {
+        if (msg['name'] == "user") {
+          var n=msg['num_points'];
+          for(i = 0;i<n ; i++){
+            r1=msg['i'+i];
+            c1=msg['j'+i];
+          var v = Number((8 * r1)) + Number(c1);
+          // socket.emit("chance_palyed", { r: r, c: c, opp: "opponent" });
+          var cell = $("#opponent").find("td").eq(v); // or $("#Table").find("td").eq(4);
+          cell.css("background-color", "red");
+          }
+        }
+        if (msg['name'] == "opponent") {
+          var n = msg['num_points'];
+          for(i=0;i<n;i++){
+            r1=msg['i'+i];
+            c1=msg['j'+i];
+            var v = Number((8 * r1)) + Number(c1);
+          var cell = $("#user").find("td").eq(v); // or $("#Table").find("td").eq(4);
+          cell.css("background-color", "blue");
+          }
+        }
+      });
+      //emit when clicking at i,j 
+      if(is_playing == 1){
+        socket.emit("chance_played",{user: name, i:r,j:c});
       }
+      //for changing the colour when chance is played;
+      socket.on("colour_change",function (msg){
+        tb=msg['table'];
+        r2=msg['i'];
+        c2=msg['j'];
+        var v1=Number((8 * r2)) + Number(c2);
+        if (tb=='user'){
+          var cell1 =$('#user').find("td").eq(v1);
+          cell1.css("background-colour", "red");
+        }
+        if(tb='opponent'){
+          var cell1=$('#opponenet').find("td").eq(v1);
+          cell1.css("background-colour","blue");
+        }
+      });
+      
     })
+  //   $('#try_it').click(function() {
+  //     var a = document.getElementById("shape").selectedIndex ;
+  //     var b = document.getElementById("h_or_v").selectedIndex
+  //   document.getElementById("para").innerHTML=a + " and " + b;
+  // });
 
   }
   render() {
@@ -280,6 +323,18 @@ class Board extends React.Component {
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         </table>
+        <p id="para"></p>
+        <select id="shape">
+  <option>Apple</option>
+  <option>Orange</option>
+  <option>Pineapple</option>
+  <option>Banana</option>
+</select>
+<select id="h_or_v">
+  <option>horizontal</option>
+  <option>vertical</option>
+</select>
+<button id="try_it">Try it</button>
       </div>
     );
   }
