@@ -72,7 +72,7 @@ nsp.on('connection', function (socket) {
 
   socket.on('send-request', function (msg) {
     post.getUsername(socket.id, function (result) {
-      console.log("from" + result + " to " + msg);
+      console.log("from " + result + " to " + msg);
       post.getId(msg, function (result1) {
         nsp.to(result1).emit("request send", result)
       });
@@ -143,6 +143,10 @@ nsp.on('connection', function (socket) {
       nsp.emit('online-users', result);
     });
   });
+
+//   socket.on('check', function (i,j) {
+//     var 
+//   });
 
 });
 
