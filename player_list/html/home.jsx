@@ -262,6 +262,20 @@ class Board extends React.Component {
       }
       //for changing the colour when chance is played;
      });
+     $("#start_game").click(function() {
+       socket.emit('can game be started',{username: user_name, opponent: opponent_name});
+     });
+     socket.on("game_play",function(msg){
+      $("#start_game").hide();
+      $('#shape').hide();
+      $('#h_or_v').hide();
+     });
+
+     socket.on('message to display',function(msg){
+       document.getElementById('turn').innerHTML=msg;
+     })
+
+     
 
       socket.on("colour_change", function (msg) {
         console.log(msg);console.log("GERG");
@@ -325,7 +339,7 @@ class Board extends React.Component {
           <option>horizontal</option>
           <option>vertical</option>
         </select>
-        <button id="try_it">Try it</button>
+        <button id="start_game">Start Game</button>
       </div>
     );
   }
@@ -359,7 +373,7 @@ socket.on('request send', function (msg) {
 
 socket.on('start-game', function (msg) {
   opponent_name = msg;
-  ReactDOM.render(<Board />, document.getElementById('root'));
+  ReactDOM.render(<Board />, document.getElementById('app'));
 });
 
 socket.on('request declined sendto'), function () {
