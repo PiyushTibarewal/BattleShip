@@ -189,7 +189,7 @@ class ActivePlayers extends React.Component {
         <tbody>
           {
             this.state.posts.map(function (post, index) {
-
+              if(post.username != user_name){
               return <tr key={index} >
                 <td>{index + 1}</td>
                 <td>{post.username}</td>
@@ -199,7 +199,7 @@ class ActivePlayers extends React.Component {
                 {/* <td>
                   <span onClick={this.deletePost.bind(this, post.id)} className="glyphicon glyphicon-remove"></span>
                 </td> */}
-              </tr>
+              </tr>}
             }.bind(this))
           }
         </tbody>

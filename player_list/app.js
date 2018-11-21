@@ -123,8 +123,12 @@ nsp.on('connection', function (socket) {
 
   socket.on('challenge-accepted', function (msg) {
     nsp.to(socket.id).emit('start-game', msg);
+    console.log('Challenge accepted to',msg);
     post.getId(msg, function (result) {
-      post.getUsername(socket.id, function (result2) { nsp.to(result).emit('start-game', result2); });
+      post.getUsername(socket.id, function (result2) { 
+        console.log('Challenge accepted by',result2);
+
+        nsp.to(result).emit('start-game', result2); });
     });
   });
 
