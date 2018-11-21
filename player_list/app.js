@@ -160,7 +160,7 @@ nsp.on('connection', function (socket) {
     console.log(msg);
     post.getId(msg['table'], function (result) {
       console.log({ table: 'user', i: msg['i'], j: msg['j']});
-      nsp.to(result).emit('colour_change',{ table: 'user', i: msg['i'], j: msg['j']});
+      nsp.to(result).emit('colour_change',{ table: 'user', i: msg['i'], j: msg['j'], color: 'brown'});
     });
   });
 
@@ -195,7 +195,7 @@ nsp.on('connection', function (socket) {
             console.log("Ship ", var_name, "can be placed on ", msg['user'], " at i,j:", msg['i'], msg['j']);
             blocks.forEach ( function (entry) {
               console.log("Placing Block of ",var_name," on ",msg['user'],"at ", msg['i']+entry[0], ",", msg['j']+entry[1]);
-              nsp.to(socket.id).emit('colour_change', { user : msg['user'], i: msg['i']+entry[0], j: msg['j']+entry[1], color: 'brown'});
+              nsp.to(socket.id).emit('colour_change', { table : 'user', i: msg['i']+entry[0], j: msg['j']+entry[1], color: 'brown'});
               post.setBlockColour(msg['user'], msg['i']+entry[0], msg['j']+entry[1], 1);
             });
             post.setadd_info(msg['user'], pos, 1);
