@@ -198,22 +198,31 @@ module.exports = {
 		});
 	},
 
-	checkT : function (user,i,j,orientation,callback) {
-		var checkBlocks = [[i,j]];
-		if (orientation == 0) {
-			checkBlocks = [[i,j],[i+1,j],[i,j-1],[i,j+1]];
-		}
-		else if (orientation == 1) {
-			checkBlocks = [[i,j],[i+1,j],[i-1,j],[i,j+1]];
-		}	
+	setadd_info : function (user, i, val) {
+		db1.connection.query("update ? set add_info=? where row_no=?",[user,val,i], (err,rows) => {});
+	},
+
+	getadd_info : function (user, i, callback) {
+		db1.connection.query("select add_info from ? where row_no=?",[user,i], (err,rows) => {
+			var result = JSON.stringify(rows);
+			var red = JSON.parse(result);
+			var check = red[0]['add_info'];
+			callback(check);
+		});
+	},
+
+
+	checkBlocks : function (user,i,j,Blocks,callback) {
 		var ans = 1;
-		checkBlocks.forEach ( function (entry) {
-			if (entry[0] < 1 || entry[0] > 8 || entry[1] < 1 || entry[1] > 8) {
+		Blocks.forEach ( function (entry) {
+			var x = entry[0]+i;
+			var y = entry[1]+j;
+			if (x < 1 || x > 8 || y < 1 || y > 8) {
 				ans = 0;
 			}
 			else {
-				var col_no = 'col_' + entry[1];
-				db1.connection.query("select ? from ? where row_no=?", [col_no,user,entry[0]], (err,rows) => {
+				var col_no = 'col_' + y;
+				db1.connection.query("select ? from ? where row_no=?", [col_no,user,x], (err,rows) => {
 					var result = JSON.stringify(rows);
 					var red = JSON.parse(result);
 					var check = red[0][col_no];
@@ -223,153 +232,9 @@ module.exports = {
 				});
 			}
 		});
-		if (ans==1) callback(true);
+		if (ans == 1) callback(true);
 		else callfack(false);
 	},
-
-	checkI : function (user,i,j,orientation,callback) {
-		var checkBlocks = [[i,j]];
-		if (orientation == 0) {
-			checkBlocks = [[i,j],[i+1,j],[i,j-1],[i,j+1],[i+2,j],[i+2,j+1],[i+2,j-1]];
-		}
-		else if (orientation == 1) {
-			checkBlocks = [[i,j],[i+1,j],[i-1,j],[i,j+1],[i,j+2],[i+1,j+2],[i-1,j+2]];
-		}	
-		var ans = 1;
-		checkBlocks.forEach ( function (entry) {
-			if (entry[0] < 1 || entry[0] > 8 || entry[1] < 1 || entry[1] > 8) {
-				ans = 0;
-			}
-			else {
-				var col_no = 'col_' + entry[1];
-				db1.connection.query("select ? from ? where row_no=?", [col_no,user,entry[0]], (err,rows) => {
-					var result = JSON.stringify(rows);
-					var red = JSON.parse(result);
-					var check = red[0][col_no];
-					if (check != 0) {
-						ans = 0;
-					}
-				});
-			}
-		});
-		if (ans==1) callback(true);
-		else callfack(false);
-	},
-
-	checkL : function (user,i,j,orientation,callback) {
-		var checkBlocks = [[i,j]];
-		if (orientation == 0) {
-			checkBlocks = [[i,j],[i-1,j],[i,j+1]];
-		}
-		else if (orientation == 1) {
-			checkBlocks = [[i,j],[i+1,j],[i,j-1]];
-		}	
-		var ans = 1;
-		checkBlocks.forEach ( function (entry) {
-			if (entry[0] < 1 || entry[0] > 8 || entry[1] < 1 || entry[1] > 8) {
-				ans = 0;
-			}
-			else {
-				var col_no = 'col_' + entry[1];
-				db1.connection.query("select ? from ? where row_no=?", [col_no,user,entry[0]], (err,rows) => {
-					var result = JSON.stringify(rows);
-					var red = JSON.parse(result);
-					var check = red[0][col_no];
-					if (check != 0) {
-						ans = 0;
-					}
-				});
-			}
-		});
-		if (ans==1) callback(true);
-		else callfack(false);
-	},
-
-	check3 : function (user,i,j,orientation,callback) {
-		var checkBlocks = [[i,j]];
-		if (orientation == 1) {
-			checkBlocks = [[i,j],[i,j+1],[i,j+2]];
-		}
-		else if (orientation == 0) {
-			checkBlocks = [[i,j],[i+1,j],[i+2,j]];
-		}	
-		var ans = 1;
-		checkBlocks.forEach ( function (entry) {
-			if (entry[0] < 1 || entry[0] > 8 || entry[1] < 1 || entry[1] > 8) {
-				ans = 0;
-			}
-			else {
-				var col_no = 'col_' + entry[1];
-				db1.connection.query("select ? from ? where row_no=?", [col_no,user,entry[0]], (err,rows) => {
-					var result = JSON.stringify(rows);
-					var red = JSON.parse(result);
-					var check = red[0][col_no];
-					if (check != 0) {
-						ans = 0;
-					}
-				});
-			}
-		});
-		if (ans==1) callback(true);
-		else callfack(false);
-	},
-
-	check2 : function (user,i,j,orientation,callback) {
-		var checkBlocks = [[i,j]];
-		if (orientation == 0) {
-			checkBlocks = [[i,j],[i+1,j]];
-		}
-		else if (orientation == 1) {
-			checkBlocks = [[i,j],[i,j+1]];
-		}	
-		var ans = 1;
-		checkBlocks.forEach ( function (entry) {
-			if (entry[0] < 1 || entry[0] > 8 || entry[1] < 1 || entry[1] > 8) {
-				ans = 0;
-			}
-			else {
-				var col_no = 'col_' + entry[1];
-				db1.connection.query("select ? from ? where row_no=?", [col_no,user,entry[0]], (err,rows) => {
-					var result = JSON.stringify(rows);
-					var red = JSON.parse(result);
-					var check = red[0][col_no];
-					if (check != 0) {
-						ans = 0;
-					}
-				});
-			}
-		});
-		if (ans==1) callback(true);
-		else callfack(false);
-	},
-
-	check1 : function (user,i,j,orientation,callback) {
-		var checkBlocks = [[i,j]];
-		var ans = 1;
-		checkBlocks.forEach ( function (entry) {
-			if (entry[0] < 1 || entry[0] > 8 || entry[1] < 1 || entry[1] > 8) {
-				ans = 0;
-			}
-			else {
-				var col_no = 'col_' + entry[1];
-				db1.connection.query("select ? from ? where row_no=?", [col_no,user,entry[0]], (err,rows) => {
-					var result = JSON.stringify(rows);
-					var red = JSON.parse(result);
-					var check = red[0][col_no];
-					if (check != 0) {
-						ans = 0;
-					}
-				});
-			}
-		});
-		if (ans==1) callback(true);
-		else callfack(false);
-	},
-
-	test : function (callback) {
-		callback(true);
-		callback(false);
-	}
 
 }
 

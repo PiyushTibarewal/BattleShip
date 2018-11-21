@@ -268,8 +268,8 @@ class Board extends React.Component {
         var tb = msg['table'];
         var r = msg['i'];
         var c = msg['j'];
-        var r2 = Number(r)+1;
-        var c2 = Number(c)+1;
+        var r2 = Number(r)-1;
+        var c2 = Number(c)-1;
         var v1 = Number((8 * r2)) + Number(c2);console.log(v1);
         if (tb == 'user') {
           var cell1 = $('#user').find("td").eq(v1);console.log(cell1);
@@ -314,10 +314,12 @@ class Board extends React.Component {
         </table>
         <p id="para"></p>
         <select id="shape">
-          <option>Apple</option>
-          <option>Orange</option>
-          <option>Pineapple</option>
-          <option>Banana</option>
+          <option>L</option>
+          <option>I</option>
+          <option>T</option>
+          <option>3</option>
+          <option>2</option>
+          <option>1</option>
         </select>
         <select id="h_or_v">
           <option>horizontal</option>
