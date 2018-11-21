@@ -98,12 +98,16 @@ module.exports = {
 
 	setIs_playing: function (val, username,callback) {
 		// console.log("starting to set id of ", username, " to ", id, "in sql request");
-		db1.connection.query("update game_user set is_playing=? where username=?", [val , username], (err, rows) => {});
+		db1.connection.query("update game_user set is_playing=? where username=?", [val , username], (err, rows) => {
+			callback();
+		});
 	},
 
 	setOpponent: function (val, username,callback) {
 		// console.log("starting to set id of ", username, " to ", id, "in sql request");
-		db1.connection.query("update game_user set opponent=? where username=?", [val, username], (err, rows) => {});
+		db1.connection.query("update game_user set opponent=? where username=?", [val, username], (err, rows) => {
+			callback();
+		});
 	},
 
 
