@@ -11,18 +11,18 @@ var refreshed = false;
 var lastLoggedIn = null;
 var app = express();
 
-var verticalI = [3,[[0,0],[-1,0],[1,0],[1,1],[-1,1],[1,-1],[-1,-1]]];
-var horizontalI = [3,[[0,0],[0,-1],[0,1],[1,1],[1,-1],[-1,1],[-1,-1]]];
-var verticalL = [4,[[0,0],[0,1],[-1,0]]];
-var horizontalL = [4,[[0,0],[1,0],[0,-1]]];
-var verticalT = [5,[[0,0],[1,0],[0,-1],[0,1]]];
-var horizontalT = [5,[[0,0],[0,1],[-1,0],[1,0]]];
-var vertical3 = [6,[[0,0],[1,0],[-1,0]]];
-var horizontal3 = [6,[[0,0],[0,1],[0,-1]]];
-var vertical2 = [7,[[0,0],[1,0]]];
-var horizontal2 = [7,[[0,0],[0,1]]];
-var vertical1 = [8,[[0,0]]];
-var horizontal1 = [8,[[0,0]]];
+var verticalI = [3, [[0, 0], [-1, 0], [1, 0], [1, 1], [-1, 1], [1, -1], [-1, -1]]];
+var horizontalI = [3, [[0, 0], [0, -1], [0, 1], [1, 1], [1, -1], [-1, 1], [-1, -1]]];
+var verticalL = [4, [[0, 0], [0, 1], [-1, 0]]];
+var horizontalL = [4, [[0, 0], [1, 0], [0, -1]]];
+var verticalT = [5, [[0, 0], [1, 0], [0, -1], [0, 1]]];
+var horizontalT = [5, [[0, 0], [0, 1], [-1, 0], [1, 0]]];
+var vertical3 = [6, [[0, 0], [1, 0], [-1, 0]]];
+var horizontal3 = [6, [[0, 0], [0, 1], [0, -1]]];
+var vertical2 = [7, [[0, 0], [1, 0]]];
+var horizontal2 = [7, [[0, 0], [0, 1]]];
+var vertical1 = [8, [[0, 0]]];
+var horizontal1 = [8, [[0, 0]]];
 
 app.use(cookieParser());
 app.use(session({
@@ -83,7 +83,7 @@ var nsp = io.of('/home');
 nsp.on('connection', function (socket) {
 
   console.log("made connection with socket id ", socket.id)
-  socket.on('home-initialized', function(){
+  socket.on('home-initialized', function () {
     nsp.to(socket.id).emit('render-home');
   });
   socket.on('send-request', function (msg) {
@@ -123,19 +123,19 @@ nsp.on('connection', function (socket) {
 
   socket.on('challenge-accepted', function (msg) {
     nsp.to(socket.id).emit('start-game', msg);
-    console.log('Challenge accepted to',msg);
+    console.log('Challenge accepted to', msg);
     var opponent = msg;
     var user = msg;
     post.getId(msg, function (result) {
-      post.getUsername(socket.id, function (result2) { 
-        console.log('Challenge accepted by',result2);
+      post.getUsername(socket.id, function (result2) {
+        console.log('Challenge accepted by', result2);
         nsp.to(result).emit('start-game', result2);
         opponent = result2;
       });
     });
     post.dropTable(msg, function (res1) {
       post.dropTable(opponent, function (res2) {
-        post.initializetGame(user, opponent, function (resu) {});
+        post.initializetGame(user, opponent, function (resu) { });
       });
     });
   });
@@ -155,12 +155,47 @@ nsp.on('connection', function (socket) {
     res.redirect('/#/');
   }
   );
-  
-  socket.on('chance_played',function(msg){
-    console.log(msg);
-    post.getId(msg['table'], function (result) {
-      console.log({ table: 'user', i: msg['i'], j: msg['j']});
-      nsp.to(result).emit('colour_change',{ table: 'user', i: msg['i'], j: msg['j'], color: 'brown'});
+
+  socket.on('chance_played', function (msg) {
+    post.getId(msg['opponent'], function (result) {
+      post.checkBlock(msg['opponent'], msg['i'], msg['j'], function (result1) {
+        if (result1 == 0) {
+          nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'green' });
+          nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });
+          post.setadd_info(msg['opponent'], 2, 1);
+          post.setadd_info(msg['user'], 2, 0);
+          post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 3, function () { });
+          nsp.to(result).emit('message to display', "Your turn.");
+          nsp.to(socket.id).emit('message to display', "Opponent's turn");
+        }
+        else if (resut1 == 1) {
+          nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'green' });
+          nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red'});
+          post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 2, function(afterChange) {
+              if (afterChange) {
+                post.gameOver(msg['opponent'], function (ifOver) {
+                  if (ifOver) {
+                    nsp.to(socket.id).emit('message to display', "You Won.");
+                    nsp.to(result).emit('message to display', "You lost. Better luck next time.");
+                    post.changePoints(msg['user'],true);
+                    post.changePoints(msg['opponent'],false);
+                    nsp.to(socket.id).emit("render-home");
+                    nsp.to(result).emit("render-home");
+                  }
+                  else {
+                    nsp.to(socket.id).emit('message to display', "Nice move. Your turn again.");
+                    nsp.to(result).emit('message to display', "Opponent attacked correctly. Opponent's turn");
+                  }
+                })
+              }
+            });
+          nsp.to(socket.id).emit('message to display', "Your turn.");
+          nsp.to(result).emit('message to display', "Opponent's turn");
+        }
+        else {
+          nsp.to(socket.id).emit('message to display', "Sorry, can't play here again.");
+        }
+      });
     });
   });
 
@@ -179,30 +214,30 @@ nsp.on('connection', function (socket) {
   });
 
   socket.on('shape_select', function (msg) {
-    var var_name = msg['h_or_v']+msg['shape'];
+    var var_name = msg['h_or_v'] + msg['shape'];
     var blocks = eval(var_name)[1];
     var pos = eval(var_name)[0];
     // console.log(pos,msg['h_or_v'],msg['shape'],msg['h_or_v']+msg['shape'],eval(msg['h_or_v']+msg['shape'])[0],msg);
-    console.log("request of user",msg['user']," to place shape ",var_name,"at i,j:", msg['i'], msg['j']);
+    console.log("request of user", msg['user'], " to place shape ", var_name, "at i,j:", msg['i'], msg['j']);
     post.getadd_info(msg['user'], pos, var_name, function (result) {
       if (result == 1) {
-          nsp.to(socket.id).emit('message to display', "Sorry this ship is already been placed");
-          console.log("REJECTED request of user",msg['user']," to place shape ",var_name,"at i,j:", msg['i'], msg['j']," because shape already placed");
+        nsp.to(socket.id).emit('message to display', "Sorry this ship is already been placed");
+        console.log("REJECTED request of user", msg['user'], " to place shape ", var_name, "at i,j:", msg['i'], msg['j'], " because shape already placed");
       }
       else if (result == 0) {
         post.checkBlocks_rec(msg['user'], var_name, msg['i'], msg['j'], blocks, function (result1) {
-          if (result1==true) {
+          if (result1 == true) {
             console.log("Ship ", var_name, "can be placed on ", msg['user'], " at i,j:", msg['i'], msg['j']);
-            blocks.forEach ( function (entry) {
-              console.log("Placing Block of ",var_name," on ",msg['user'],"at ", msg['i']+entry[0], ",", msg['j']+entry[1]);
-              nsp.to(socket.id).emit('colour_change', { table : 'user', i: msg['i']+entry[0], j: msg['j']+entry[1], color: 'brown'});
-              post.setBlockColour(msg['user'], msg['i']+entry[0], msg['j']+entry[1], 1);
+            blocks.forEach(function (entry) {
+              console.log("Placing Block of ", var_name, " on ", msg['user'], "at ", msg['i'] + entry[0], ",", msg['j'] + entry[1]);
+              nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'brown' });
+              post.setBlockColour(msg['user'], msg['i'] + entry[0], msg['j'] + entry[1], 1, function () { });
             });
             post.setadd_info(msg['user'], pos, 1);
           }
           else {
-              nsp.to(socket.id).emit('message to display', "That's an incorrect position");
-              console.log("REJECTED request of user",msg['user']," to place shape ",var_name,"at i,j:", msg['i'], msg['j']," because incorrect position");
+            nsp.to(socket.id).emit('message to display', "That's an incorrect position");
+            console.log("REJECTED request of user", msg['user'], " to place shape ", var_name, "at i,j:", msg['i'], msg['j'], " because incorrect position");
           }
         });
       }
@@ -210,12 +245,12 @@ nsp.on('connection', function (socket) {
   });
 
   socket.on('can game be started', function (msg) {
-    post.checkGameStart(msg['user'],function (result) {
+    post.checkGameStart(msg['user'], function (result) {
       if (result == true) {
         nsp.to(socket.id).emit("game_play"); // complete
       }
-      else if (result == false){
-        nsp.to(socket.id).emit("message to display","Place all the Blocks for match to be started");
+      else if (result == false) {
+        nsp.to(socket.id).emit("message to display", "Place all the Blocks for match to be started");
         // complete may be emit opponent message
         // any setadd_info 
       }
