@@ -248,7 +248,7 @@ class Board extends React.Component {
         var a = document.getElementById("shape").selectedIndex.text;
         var b = document.getElementById("h_or_v").selectedIndex.text;
         if (name == 'user') {
-          socket.emit("shape_select", { user: user_name,opponent: opponent_name, i: Number(r)+1, j: Number(c)+1, shape: a, h_or_v: b });
+          socket.emit("shape_select", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
         }
       }
       //emit when clicking at i,j 
@@ -257,10 +257,11 @@ class Board extends React.Component {
         if (name == 'user') {
         }
         else {
-          socket.emit("chance_played", { user: user_name,opponent: opponent_name, i: Number(r)+1, j: Number(c)+1 });
+          socket.emit("chance_played", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1 });
         };
       }
       //for changing the colour when chance is played;
+
      });
      $("#start_game").click(function() {
        socket.emit('can game be started',{username: user_name, opponent: opponent_name});
@@ -301,7 +302,7 @@ class Board extends React.Component {
   render() {
     return (
       <div className="App">
-      <div class="card">
+        <div class="card">
           <div class="container">
             <p id="turn"></p>
           </div>
@@ -344,7 +345,30 @@ class Board extends React.Component {
     );
   }
 }
-
+class HomePage extends React.Component {
+  render() {return(
+    <div class="container" id="root">
+      <div class="header clearfix">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            <li role="presentation" id="homeHyperlink" class="active"><a href="#">Home</a></li>
+            <li role="presentation" id="addHyperLink"><a href="/home#/addPost">LeaderBoard</a></li>
+            <li role="presentation" id="profileHyperlink"><a href="/home#/showProfile">Profile</a></li>
+            <li role="presentation" id='logout'><a href="/logout">Logout</a></li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">Battleship</h3>
+      </div>
+      <div id="app" >
+        <Router history={hashHistory}>
+          <Route component={ActivePlayers} path="/"></Route>
+          <Route component={LeaderBoard} path="/addPost(/:id)"></Route>
+          <Route component={ShowProfile} path="/showProfile"></Route>
+        </Router>
+      </div>
+    </div>
+  );}
+}
 socket.on('online-users', function (msg) {
   var result = JSON.stringify(msg);
   var red = JSON.parse(result);
@@ -367,24 +391,14 @@ const element = <h1>Hello, world</h1>;
 
 socket.on('request send', function (msg) {
   ReactDOM.render(<ChallengeRequest username={msg} />,
-    document.getElementById('root'));
+    document.getElementById('main'));
 });
 
 
 socket.on('start-game', function (msg) {
   opponent_name = msg;
-  ReactDOM.render(<Board />, document.getElementById('app'));
+  ReactDOM.render(<Board />, document.getElementById('main'));
 });
-
-socket.on('request declined sendto'), function () {
-  ReactDOM.render(
-    <Router history={hashHistory}>
-      <Route component={ActivePlayers} path="/"></Route>
-      <Route component={LeaderBoard} path="/addPost(/:id)"></Route>
-      <Route component={ShowProfile} path="/showProfile"></Route>
-    </Router>,
-    document.getElementById('app'));
-};
 
 socket.on('request declined sendby', function (msg) {
   alert("Sorry! " + msg + " declined your challenge request");
@@ -398,13 +412,9 @@ if (window.performance) {
   if (performance.navigation.type == 1) {
     socket.emit('refresh-user', user_name);
   }
-}
-
-
-ReactDOM.render(
-  <Router history={hashHistory}>
-    <Route component={ActivePlayers} path="/"></Route>
-    <Route component={LeaderBoard} path="/addPost(/:id)"></Route>
-    <Route component={ShowProfile} path="/showProfile"></Route>
-  </Router>,
-  document.getElementById('app'));
+};
+socket.emit('home-initialized');
+socket.on('render-home', function () {
+  ReactDOM.render(<HomePage />,
+    document.getElementById('main'));
+});
