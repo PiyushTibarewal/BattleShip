@@ -7,6 +7,7 @@ var user = require('./user')
 var post = require('./post')
 const http = require('http');
 const socketio = require('socket.io');
+// var popup=require('popups');
 var refreshed = false;
 var lastLoggedIn = null;
 var app = express();
@@ -46,12 +47,17 @@ app.post('/signup', function (req, res) {
 
   if (username && password) {
     user.signup(username, password, function (result) {
-      if (result)
-        res.redirect('/#/');
+      if (result){
+      res.send('success');
+        res.redirect('/signin');
+      }
+        else {
+          res.send("Fail");
+        }
     })
   }
-  else {
-    res.send('Failure');
+  else {  
+    res.send("Failure");
   }
 })
 
@@ -63,6 +69,9 @@ app.post('/signin', function (req, res) {
     if (result) {
       sessions.username = username;
       res.send(username);
+    }
+    else{
+      res.send("Failure");
     }
   });
 })

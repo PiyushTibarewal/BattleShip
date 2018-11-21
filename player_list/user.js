@@ -9,7 +9,10 @@ module.exports = {
 			console.log("HTRBW");
 			if (json[0]['count'] == 0 && err == null) {
 				db1.connection.query("INSERT INTO game_user (`username`,`password`) VALUES (?,?)", [username, password], (e, r) => {
-					if (e) throw e;
+					if (e) {
+						callback(false);
+												
+						}
 					else {
 						callback(true);
 						console.log("Saved the user sign up details.");
@@ -17,7 +20,8 @@ module.exports = {
 				});
 			}
 			else {
-				console.log('returning false for signup')
+				callback(false);
+				console.log('returning false for signup');
 			}
 		});
 	},
