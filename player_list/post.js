@@ -37,7 +37,7 @@ module.exports = {
 
 	getPost: function (callback) {
 
-		db1.connection.query("select username from game_user where online=?", ["Y"], (err, rows) => {
+		db1.connection.query("select username from game_user where online=? and is_playing=?", ["Y","N"], (err, rows) => {
 			if (err == null) {
 				console.log("get posts using getpost ", rows);
 				callback(rows)
@@ -95,6 +95,17 @@ module.exports = {
 			}
 		});
 	},
+
+	setIs_playing: function (val, username,callback) {
+		// console.log("starting to set id of ", username, " to ", id, "in sql request");
+		db1.connection.query("update game_user set is_playing=? where username=?", [val , username], (err, rows) => {});
+	},
+
+	setOpponent: function (val, username,callback) {
+		// console.log("starting to set id of ", username, " to ", id, "in sql request");
+		db1.connection.query("update game_user set opponent=? where username=?", [val, username], (err, rows) => {});
+	},
+
 
 	deletePost: function (id, callback) {
 		db1.connection.query("update game_user set online=? where username=?", ["N", id], (err, rows) => {

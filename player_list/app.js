@@ -138,6 +138,19 @@ nsp.on('connection', function (socket) {
         post.initializetGame(user, opponent, function (resu) {});
       });
     });
+    // is_playing opponent name
+    post.setIs_playing("Y",user, function () {
+      post.setIs_playing("Y",opponent, function () {
+        post.setOpponent(opponent,user, function () {
+          post.setOpponent(user,opponent, function () {
+            post.getPost(function (result) {
+              console.log("game-started", result);
+              nsp.emit('online-users', result);
+            });
+          });
+        });    
+      });
+    });
   });
 
   socket.on('challenge-declined', function (msg) {
@@ -213,11 +226,23 @@ nsp.on('connection', function (socket) {
     post.checkGameStart(msg['user'],function (result) {
       if (result == true) {
         nsp.to(socket.id).emit("game_play"); // complete
+        post.getadd_info(msg['opponent'],2,"turn Block",function (result) {
+          if (result == 1) {            
+            post.setadd_info(msg['user'],1,1);
+            post.setadd_info(msg['opponent'],1,1);
+            post.getId(msg['opponent'],function (res) {
+              nsp.to(res).emit("message to display","Game Started. Your Turn");
+            });
+            nsp.to(socket.id).emit("message to display","Game Started. Opponent's Turn");
+          }
+          else if (result == 0) {
+            post.setadd_info(msg['user'],2,1);
+            nsp.to(socket.id).emit("message to display","Opponent hasn't Placed his Blocks. Waiting gor him");
+          }
+        });
       }
       else if (result == false){
         nsp.to(socket.id).emit("message to display","Place all the Blocks for match to be started");
-        // complete may be emit opponent message
-        // any setadd_info 
       }
       else {
         console.log("PRINTED ERROR: check can game be started in app.js");
