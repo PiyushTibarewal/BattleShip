@@ -69,7 +69,9 @@ var nsp = io.of('/home');
 nsp.on('connection', function (socket) {
 
   console.log("made connection with socket id ", socket.id)
-
+  socket.on('home-initialized', function(){
+    nsp.to(socket.id).emit('render-home');
+  });
   socket.on('send-request', function (msg) {
     post.getUsername(socket.id, function (result) {
       console.log("from " + result + " to " + msg);
@@ -89,7 +91,7 @@ nsp.on('connection', function (socket) {
       refreshed = false;
       sessions.username = lastLoggedIn;
     }
-    socket.emit('set-username', sessions.username);
+    nsp.to(socket.id).emit('set-username', sessions.username);
     post.setId(socket.id, sessions.username);
     post.getPost(function (result) {
       console.log("started-home ", result);
@@ -106,7 +108,7 @@ nsp.on('connection', function (socket) {
   socket.on('challenge-accepted', function (msg) {
     nsp.to(socket.id).emit('start-game', msg);
     post.getId(msg, function (result) {
-      post.getUsername(socket.id, function (result2) { nsp.to(result).emit("start-game", result2); });
+      post.getUsername(socket.id, function (result2) { nsp.to(result).emit('start-game', result2); });
     });
   });
   socket.on('challenge-declined', function (msg) {
@@ -116,7 +118,7 @@ nsp.on('connection', function (socket) {
           post.getUsername(socket.id, function (result2) { nsp.to(result).emit("request declined sendby", result2); });
       });
     });
-    nsp.to(socket.id).emit("request declined sendto");
+    nsp.to(socket.id).emit("render-home");
   });
   app.get('/logout', (req, res) => {
 
