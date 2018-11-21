@@ -96,6 +96,20 @@ module.exports = {
 		});
 	},
 
+	changePoints: function (username, change) {
+		// console.log("starting to set id of ", username, " to ", id, "in sql request");
+		db1.connection.query("select points from game_user where userrname=?", [username], (error,row) => {
+			var result = JSON.stringify(row);
+			var red = JSON.parse(result);
+			var points = red[0]['points'];
+			if (change) {
+				points=points+10;
+			}
+			else points=points-5;
+			db1.connection.query("update game_user set points=? where username=?", [points,username])
+		});
+	},
+
 	setIs_playing: function (val, username,callback) {
 		// console.log("starting to set id of ", username, " to ", id, "in sql request");
 		db1.connection.query("update game_user set is_playing=? where username=?", [val , username], (err, rows) => {
@@ -109,7 +123,6 @@ module.exports = {
 			callback();
 		});
 	},
-
 
 	deletePost: function (id, callback) {
 		db1.connection.query("update game_user set online=? where username=?", ["N", id], (err, rows) => {
@@ -125,7 +138,7 @@ module.exports = {
 	},
 
 	deletePostSocket: function (id, callback) {
-		db1.connection.query("update game_user set online=? where id=?", ["N", id], (err, rows) => {
+		db1.connection.query("update game_user set online=?, is_playing=? where id=?", ["N","N", id], (err, rows) => {
 			if (err == null) {
 				console.log("Deleted the post_socket.", id);
 				callback(true);
@@ -233,7 +246,7 @@ module.exports = {
 		console.log("game Over ",user," lost");
 	},
 
-	setBlockColour : function (user,i,j,colour) {
+	setBlockColour : function (user,i,j,colour,callback) {
 		var col_no = 'col_'+j;
 		var sqlq = "update "+user+" set "+col_no+"=? where row_no=?";
 		console.log("setBlockcolour of user,i,j,colour: ",user,i,j,colour);
@@ -241,6 +254,7 @@ module.exports = {
 			if (err) throw err;
 			console.log(col_no,i,colour,user,"yo");
 		});
+		callback(true);
 	},
 
 	setadd_info : function (user, i, val) {
