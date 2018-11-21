@@ -261,29 +261,44 @@ class Board extends React.Component {
         };
       }
       //for changing the colour when chance is played;
-    });
 
-    socket.on("colour_change", function (msg) {
-      console.log(msg); console.log("GERG");
-      var tb = msg['table'];
-      var r = msg['i'];
-      var c = msg['j'];
-      var r2 = Number(r) + 1;
-      var c2 = Number(c) + 1;
-      var v1 = Number((8 * r2)) + Number(c2); console.log(v1);
-      if (tb == 'user') {
-        var cell1 = $('#user').find("td").eq(v1); console.log(cell1);
-        cell1.css("background-color", msg['color']);
-        document.getElementById('turn').innerHTML = "Opponent's turn";
-      }
-      if (tb == 'opponent') {
-        var cell1 = $('#opponnet').find("td").eq(v1);
-        cell1.css("background-color", msg['color']);
-        document.getElementById('turn').innerHTML = "Your turn";
-      }
-    });
-  }
+     });
+     $("#start_game").click(function() {
+       socket.emit('can game be started',{username: user_name, opponent: opponent_name});
+     });
+     socket.on("game_play",function(msg){
+      $("#start_game").hide();
+      $('#shape').hide();
+      $('#h_or_v').hide();
+     });
 
+     socket.on('message to display',function(msg){
+       document.getElementById('turn').innerHTML=msg;
+     })
+
+     
+
+      socket.on("colour_change", function (msg) {
+        console.log(msg);console.log("GERG");
+        var tb = msg['table'];
+        var r = msg['i'];
+        var c = msg['j'];
+        var r2 = Number(r)-1;
+        var c2 = Number(c)-1;
+        var v1 = Number((8 * r2)) + Number(c2);console.log(v1);
+        if (tb == 'user') {
+          var cell1 = $('#user').find("td").eq(v1);console.log(cell1);
+          cell1.css("background-color", msg['color']);
+          document.getElementById('turn').innerHTML="Opponent's turn";
+        }
+        if (tb == 'opponent') {
+          var cell1 = $('#opponnet').find("td").eq(v1);
+          cell1.css("background-color", msg['color']);
+          document.getElementById('turn').innerHTML="Your turn";
+        }
+      });
+    }
+  
   render() {
     return (
       <div className="App">
@@ -314,16 +329,18 @@ class Board extends React.Component {
         </table>
         <p id="para"></p>
         <select id="shape">
-          <option>Apple</option>
-          <option>Orange</option>
-          <option>Pineapple</option>
-          <option>Banana</option>
+          <option>L</option>
+          <option>I</option>
+          <option>T</option>
+          <option>3</option>
+          <option>2</option>
+          <option>1</option>
         </select>
         <select id="h_or_v">
           <option>horizontal</option>
           <option>vertical</option>
         </select>
-        <button id="try_it">Try it</button>
+        <button id="start_game">Start Game</button>
       </div>
     );
   }

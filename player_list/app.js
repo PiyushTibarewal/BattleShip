@@ -10,6 +10,20 @@ const socketio = require('socket.io');
 var refreshed = false;
 var lastLoggedIn = null;
 var app = express();
+
+var verticalI = [3,[[0,0],[-1,0],[1,0],[1,1],[-1,1],[1,-1],[-1,-1]]];
+var horizontalI = [3,[[0,0],[0,-1],[0,1],[1,1],[1,-1],[-1,1],[-1,-1]]];
+var verticalL = [4,[[0,0],[0,1],[-1,0]]];
+var horizontalL = [4,[[0,0],[1,0],[0,-1]]];
+var verticalT = [5,[[0,0],[1,0],[0,-1],[0,1]]];
+var horizontalT = [5,[[0,0],[0,1],[-1,0],[1,0]]];
+var vertical3 = [6,[[0,0],[1,0],[-1,0]]];
+var horizontal3 = [6,[[0,0],[0,1],[0,-1]]];
+var vertical2 = [7,[[0,0],[1,0]]];
+var horizontal2 = [7,[[0,0],[0,1]]];
+var vertical1 = [8,[[0,0]]];
+var horizontal1 = [8,[[0,0]]];
+
 app.use(cookieParser());
 app.use(session({
   secret: 'my-secret', resave: true,
@@ -92,6 +106,7 @@ nsp.on('connection', function (socket) {
       sessions.username = lastLoggedIn;
     }
     nsp.to(socket.id).emit('set-username', sessions.username);
+
     post.setId(socket.id, sessions.username);
     post.getPost(function (result) {
       console.log("started-home ", result);
@@ -105,12 +120,14 @@ nsp.on('connection', function (socket) {
       nsp.emit('leaderboard', result);
     });
   });
+
   socket.on('challenge-accepted', function (msg) {
     nsp.to(socket.id).emit('start-game', msg);
     post.getId(msg, function (result) {
       post.getUsername(socket.id, function (result2) { nsp.to(result).emit('start-game', result2); });
     });
   });
+
   socket.on('challenge-declined', function (msg) {
     post.getId(msg, function (result) {
       post.isPlaying(msg, function (result1) {
@@ -120,14 +137,17 @@ nsp.on('connection', function (socket) {
     });
     nsp.to(socket.id).emit("render-home");
   });
+
   app.get('/logout', (req, res) => {
 
     res.redirect('/#/');
   }
   );
+  
   socket.on('chance_played',function(msg){
     console.log(msg);
-    post.getId(msg['table'], function (result) {console.log({ table: 'user', i: msg['i'], j: msg['j']});
+    post.getId(msg['table'], function (result) {
+      console.log({ table: 'user', i: msg['i'], j: msg['j']});
       nsp.to(result).emit('colour_change',{ table: 'user', i: msg['i'], j: msg['j']});
     });
   });
@@ -146,9 +166,41 @@ nsp.on('connection', function (socket) {
     });
   });
 
-//   socket.on('check', function (i,j) {
-//     var 
-//   });
+  socket.on('shape_select', function (msg) {
+    var blocks = eval(msg['h_or_v']+msg['shape'])[1];
+    var pos = eval(msg['h_or_v']+msg['shape'])[0];
+    post.getadd_info(msg['user'], pos, function (result) {
+      if (result == 1) {
+        //message sorry already placed it
+        post.getId(msg['table'], function (res){
+          blocks.forEach ( function (entry) {
+            nsp.to(res).emit('message to display', "Sorry this ship is already been placed");
+          });
+        });
+      }
+      else if (result == 0) {
+        post.checkBlocks(msg['user'], msg['i'], msg['j'], blocks, function (result1) {
+          if (result1==true) {
+            //emit and set all blocks
+            post.getId(msg['table'], function (res){
+              blocks.forEach ( function (entry) {
+                nsp.to(res).emit('colour_change', { user : msg['user'], i: msg['i']+entry[0], j: msg['j']+entry[1], color: 'brown'});
+              });
+            });
+            post.setadd_info(msg['user'], pos, 1);
+          }
+          else {
+            // message sorry incorrect position
+            post.getId(msg['table'], function (res){
+              blocks.forEach ( function (entry) {
+                nsp.to(res).emit('message to display', "That's an incorrect position");
+              });
+            });
+          }
+        });
+      }
+    });
+  });
 
 });
 
