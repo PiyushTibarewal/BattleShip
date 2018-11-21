@@ -292,12 +292,10 @@ class Board extends React.Component {
         if (tb == 'user') {
           var cell1 = $('#user').find("td").eq(v1);console.log(cell1);
           cell1.css("background-color", msg['color']);
-          document.getElementById('turn').innerHTML="Opponent's turn";
         }
         if (tb == 'opponent') {
           var cell1 = $('#opponnet').find("td").eq(v1);
           cell1.css("background-color", msg['color']);
-          document.getElementById('turn').innerHTML="Your turn";
         }
       });
     }
