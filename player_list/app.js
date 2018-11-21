@@ -120,6 +120,13 @@ nsp.on('connection', function (socket) {
       nsp.emit('leaderboard', result);
     });
   });
+  socket.on('SEND_MESSAGE', function(data){
+    post.getId(data['to_send'],function (result){
+      nsp.to(result).emit('RECEIVE_MESSAGE', data);
+      nsp.to(socket.id).emit('RECEIVE_MESSAGE', data);
+    })
+    
+})
 
   socket.on('challenge-accepted', function (msg) {
     nsp.to(socket.id).emit('start-game', msg);
