@@ -19,7 +19,10 @@ class Signin extends React.Component {
       password: this.state.password
     })
       .then(function (response) {
-        if (response.data) {
+        if(response.data=="Failure"){
+          alert("Provided login credentials are wrong.Please login again.");
+        }
+        else if (response.data) {
           localStorage.setItem('myusername', response.data);
           var ip = 'http://'+window.location.hostname+':7777/home';
           window.location.assign(ip);
@@ -81,6 +84,15 @@ class Signup extends React.Component {
     })
       .then(function (response) {
         console.log(response);
+        if(response.data=="Failure"){
+          alert("Please provide the full credentials");  
+        }
+        else if(response.data=="Fail"){
+          alert("This username is already taken");
+        }
+        else{
+          alert("successfully signed up");
+        }
       })
       .catch(function (error) {
         console.log(error);
