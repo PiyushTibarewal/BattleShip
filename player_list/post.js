@@ -151,6 +151,7 @@ module.exports = {
 					db1.connection.query("insert into ? ('row_no') values (7)", [second], (e,r) => {});
 					db1.connection.query("insert into ? ('row_no') values (8)", [second], (e,r) => {});
 				});
+				console.log("Inititalized game between ", first, " and ", second);
 				callback(true);
 			}
 			else {
@@ -167,6 +168,7 @@ module.exports = {
 			var check = red[0][col_no];
 			callback(check);
 		});
+		console.log("user ",user,"tried to hit ",row,",",col);
 	},
 
 	// shipSunk : function () {
@@ -186,16 +188,10 @@ module.exports = {
 		})
 	},
 
-	setBlockColour : function (user,i,j,colour,callback) {
+	setBlockColour : function (user,i,j,colour) {
 		var col_no = 'col_'+j;
-		db1.connection.query("update ? set ?=? where row_no=?",[user,col_no,colour,i], (err,rows) => {
-			if (err == NULL) {
-				callback(true);
-			}
-			else {
-				callback(false);
-			}
-		});
+		db1.connection.query("update ? set ?=? where row_no=?",[user,col_no,colour,i], (err,rows) => {});
+
 	},
 
 	setadd_info : function (user, i, val) {
