@@ -298,8 +298,12 @@ class Board extends React.Component {
           cell1.css("background-color", msg['color']);
         }
       });
+
+      socket.on("game_started", function () {
+        is_playing = 1;
+      });
     }
-  
+
   render() {
     return (
       <div className="App">

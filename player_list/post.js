@@ -125,7 +125,7 @@ module.exports = {
 	},
 
 	deletePost: function (id, callback) {
-		db1.connection.query("update game_user set online=? where username=?", ["N", id], (err, rows) => {
+		db1.connection.query("update game_user set online=?, is_playing=? where username=?", ["N", "N", id], (err, rows) => {
 			if (err == null) {
 				console.log("Deleted the post.", id);
 				callback(true);
@@ -160,14 +160,14 @@ module.exports = {
 	},
 
 	initializetGame	: function (first,second,callback) {
-		var sqlq = "select is_playing from game_user where username = '"+first+"' or username = '"+second+"'";
-		db1.connection.query(sqlq, (err, rows) => {
-			var result = JSON.stringify(rows);
-			console.log(result,rows,sqlq);// debug
-			var red = JSON.parse(result);
-			var check1 = red[0]['is_playing'];
-			var check2 = red[1]['is_playing'];
-			if (check1 == "N" && check2 == "N") {
+		// var sqlq = "select is_playing from game_user where username = '"+first+"' or username = '"+second+"'";
+		// db1.connection.query(sqlq, (err, rows) => {
+		// 	var result = JSON.stringify(rows);
+		// 	console.log(result,rows,sqlq);// debug
+		// 	var red = JSON.parse(result);
+		// 	var check1 = red[0]['is_playing'];
+		// 	var check2 = red[1]['is_playing'];
+		// 	if (check1 == "N" && check2 == "N") {
 				var sqlq1 = "create table "+first+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
 				db1.connection.query(sqlq1, (err,row) => {
 					var sqlq11 = "insert into "+first+" (row_no) values (1)";
@@ -208,20 +208,21 @@ module.exports = {
 				});
 				console.log("Inititalized game between ", first, " and ", second);
 				callback(true);
-			}
-			else {
-				callback(false);
-			}
-		});
+			// }
+			// else {
+			// 	callback(false);
+			// }
+		// });
 	},
 
 	checkBlock : function (user,row,col,callback) {
 		var col_no = 'col_'+col;
-		var sqlq = "select ? from "+user+" where row_no=?";// might be an error
-		db1.connection.query(sqlq,[col_no,row], (err,rows) => {
+		var sqlq = "select "+col_no+" from "+user+" where row_no=?";// might be an error
+		db1.connection.query(sqlq,[row], (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
 			var check = red[0][col_no];
+			console.log(check,red,result,"hii","col_no",col_no,sqlq);
 			callback(check);
 			console.log(user,"'s opponent tried to hit ",row,",",col,"output=",check);
 		});

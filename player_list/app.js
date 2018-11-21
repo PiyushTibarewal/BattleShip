@@ -180,6 +180,7 @@ nsp.on('connection', function (socket) {
   socket.on('chance_played', function (msg) {
     post.getId(msg['opponent'], function (result) {
       post.checkBlock(msg['opponent'], msg['i'], msg['j'], function (result1) {
+        console.log("chance played ",result1);
         if (result1 == 0) {
           nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'green' });
           nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });
@@ -189,7 +190,7 @@ nsp.on('connection', function (socket) {
           nsp.to(result).emit('message to display', "Your turn.");
           nsp.to(socket.id).emit('message to display', "Opponent's turn");
         }
-        else if (resut1 == 1) {
+        else if (result1 == 1) {
           nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'green' });
           nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });
           post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 2, function (afterChange) {
@@ -273,7 +274,9 @@ nsp.on('connection', function (socket) {
           if (result == 1) {
             post.setadd_info(msg['user'], 1, 1);
             post.setadd_info(msg['opponent'], 1, 1);
+            nsp.to(socket.io).emit("game_started");
             post.getId(msg['opponent'], function (res) {
+              nsp.to(res).emit("game_started");
               nsp.to(res).emit("message to display", "Game Started. Your Turn");
             });
             nsp.to(socket.id).emit("message to display", "Game Started. Opponent's Turn");
