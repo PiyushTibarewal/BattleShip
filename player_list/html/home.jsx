@@ -199,7 +199,8 @@ class ActivePlayers extends React.Component {
                 {/* <td>
                   <span onClick={this.deletePost.bind(this, post.id)} className="glyphicon glyphicon-remove"></span>
                 </td> */}
-              </tr>}
+              </tr>
+              }
             }.bind(this))
           }
         </tbody>
@@ -266,7 +267,7 @@ class Board extends React.Component {
 
      });
      $("#start_game").click(function() {
-       socket.emit('can game be started',{username: user_name, opponent: opponent_name});
+       socket.emit('can game be started',{user: user_name, opponent: opponent_name});
      });
      socket.on("game_play",function(msg){
       $("#start_game").hide();
@@ -332,15 +333,15 @@ class Board extends React.Component {
         <p id="para"></p>
         <select id="shape">
           <option value="L">L</option>
-          <option>I</option>
-          <option>T</option>
-          <option>3</option>
-          <option>2</option>
-          <option>1</option>
+          <option value="I">I</option>
+          <option value="T">T</option>
+          <option value="3">3</option>
+          <option value="2">2</option>
+          <option value="1">1</option>
         </select>
         <select id="h_or_v">
           <option value="horizontal">horizontal</option>
-          <option>vertical</option>
+          <option value="vertical">vertical</option>
         </select>
         <button id="start_game">Start Game</button>
       </div>

@@ -123,16 +123,25 @@ module.exports = {
 
 	},
 
-	initializetGame	: function (first,second,callback) {
+	dropTable : function (user,callback) {
+		var sqlq = "drop table "+user;
+		db1.connection.query(sqlq, (err,rows) => {
+			if (err) callback(false);
+			else callback(true);
+		});
+	},
 
-		db1.connection.query("select is_playing from game_user where username=?", [msg], (err, rows) => {
+	initializetGame	: function (first,second,callback) {
+		var sqlq = "select is_playing from game_user where username = '"+first+"' or username = '"+second+"'";
+		db1.connection.query(sqlq, (err, rows) => {
 			var result = JSON.stringify(rows);
+			console.log(result,rows,sqlq);// debug
 			var red = JSON.parse(result);
 			var check1 = red[0]['is_playing'];
 			var check2 = red[1]['is_playing'];
 			if (check1 == "N" && check2 == "N") {
 				var sqlq1 = "create table "+first+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
-				db1.connection.query(sqlq, (err,row) => {
+				db1.connection.query(sqlq1, (err,row) => {
 					var sqlq11 = "insert into "+first+" (row_no) values (1)";
 					var sqlq12 = "insert into "+first+" (row_no) values (2)";
 					var sqlq13 = "insert into "+first+" (row_no) values (3)";
@@ -199,7 +208,7 @@ module.exports = {
 		db1.connection.query(sqlq, (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
-			if (red == NULL) {
+			if (red.length == 0) {
 				callback(true);
 			}
 			else {
@@ -215,7 +224,7 @@ module.exports = {
 		console.log("setBlockcolour of user,i,j,colour: ",user,i,j,colour);
 		db1.connection.query(sqlq,[colour,i], (err,rows) => {
 			if (err) throw err;
-			console.log(col_no,i,colour,user);
+			console.log(col_no,i,colour,user,"yo");
 		});
 	},
 
@@ -225,29 +234,36 @@ module.exports = {
 		console.log("updated add_info of u,i",user,i);
 	},
 
-	getadd_info : function (user, i, callback) {
+	getadd_info : function (user, i, shape, callback) {
 		var sqlq = "select add_info from "+user+" where row_no=?";
 		db1.connection.query(sqlq,[i], (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
 			var check = red[0]['add_info'];
-			console.log("retriving getaddd_info of user,i:",user,i," return check :",check);
+			console.log("retriving getaddd_info of user,i,shape:",user,i,shape," return check :",check);
 			callback(check);
 		});
 	},
 
-	// checkGameStart : function (user,callback) {
-	// 	db1.connection.query("select row_no from ? where add_info=1", [user], (err,rows) => {
-	// 		var result = JSON.stringify(rows);
-	// 		var red = JSON.parse(result);
-	// 		if (red == NULL)
-	// 	});
-	// },
+	checkGameStart : function (user, callback) {
+		console.log("checking if all ships are placed in sea grid of ",user);
+		var sqlq = "select row_no from "+user+" where row_no>2 and add_info=1";
+		db1.connection.query(sqlq, (err,rows) => {
+			var result = JSON.stringify(rows);
+			var red = JSON.parse(result);
+			if (red.length == 6) {
+				callback(true);
+			}
+			else callback(false);
+		});
+	},
 
 
 	checkBlocks_rec : function (user,shape,i,j,Blocks,callback) {
-		if (Blocks == NULL) callback(true);
+		console.log(Blocks);// for debug
+		if (Blocks.length == 0) callback(true);
 		else {
+			console.log("Checking ",i+Blocks[0][0],",",j+Blocks[0][1]," of user ",user,"to place shape ",shape)
 			var x = Blocks[0][0]+i;
 			var y = Blocks[0][1]+j;
 			if (x < 1 || x > 8 || y < 1 || y > 8) {
@@ -261,13 +277,13 @@ module.exports = {
 					var result = JSON.stringify(rows);
 					var red = JSON.parse(result);
 					var check = red[0][col_no];
-					console.log(result,col_no,check,x,y,red);
+					// console.log(result,col_no,check,x,y,red);
 					if (check != 0) {
 						callback(false);
 					}
 					else {
-						checkBlocks_rec(user,shape,i,j,Blocks, function (result) {
-							callback(res);
+						this.checkBlocks_rec(user,shape,i,j,Blocks.slice(1), function (result) {
+							callback(result);
 						});// might be error add this. infront
 					}
 				});
@@ -275,34 +291,34 @@ module.exports = {
 		}
 	},
 
-	checkBlocks : function (user,i,j,Blocks,callback) {
-		var ans = 1;
-		Blocks.forEach ( function (entry) {
-			var x = entry[0]+i;
-			var y = entry[1]+j;
-			if (x < 1 || x > 8 || y < 1 || y > 8) {
-				ans = 0;
+	// checkBlocks : function (user,i,j,Blocks,callback) {
+	// 	var ans = 1;
+	// 	Blocks.forEach ( function (entry) {
+	// 		var x = entry[0]+i;
+	// 		var y = entry[1]+j;
+	// 		if (x < 1 || x > 8 || y < 1 || y > 8) {
+	// 			ans = 0;
 
-			}
-			else {
-				var col_no = 'col_' + y;
-				// var sqlq = "select ? from "+user+" where row_no=?";
-				var sqlq = "select "+col_no+" from "+user+" where row_no="+x;
-				db1.connection.query(sqlq, (err,rows) => {
-					var result = JSON.stringify(rows);
-					var red = JSON.parse(result);
-					var check = red[0][col_no];
-					console.log(result,col_no,check,x,y,red);
-					if (check != 0) {
-						ans = 0;
-					}
-				});
-			}
-		});
-		console.log(ans,"yo");
-		if (ans == 1) callback(true);
-		else callback(false);
-	},
+	// 		}
+	// 		else {
+	// 			var col_no = 'col_' + y;
+	// 			// var sqlq = "select ? from "+user+" where row_no=?";
+	// 			var sqlq = "select "+col_no+" from "+user+" where row_no="+x;
+	// 			db1.connection.query(sqlq, (err,rows) => {
+	// 				var result = JSON.stringify(rows);
+	// 				var red = JSON.parse(result);
+	// 				var check = red[0][col_no];
+	// 				console.log(result,col_no,check,x,y,red);
+	// 				if (check != 0) {
+	// 					ans = 0;
+	// 				}
+	// 			});
+	// 		}
+	// 	});
+	// 	console.log(ans,"yo");
+	// 	if (ans == 1) callback(true);
+	// 	else callback(false);
+	// },
 
 }
 
