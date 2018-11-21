@@ -8,7 +8,7 @@ var user_name = null;
 var show = null;
 var leader = null;
 var opponent_name = null;
-var is_playing = 1;
+var is_playing = 0;
 // import $ from 'jquery';
 class ShowProfile extends React.Component {
   constructor(props) {
@@ -245,8 +245,10 @@ class Board extends React.Component {
       var c = $(this).parent().children().index($(this));
       var r = $(this).parent().parent().children().index($(this).parent());
       if (is_playing == 0) {
-        var a = document.getElementById("shape").selectedIndex.text;
-        var b = document.getElementById("h_or_v").selectedIndex.text;
+        var a = $('#shape').val();
+        console.log(a);
+        var b = $('#h_or_v').val();
+        console.log(b);
         if (name == 'user') {
           socket.emit("shape_select", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
         }
@@ -329,7 +331,7 @@ class Board extends React.Component {
         </table>
         <p id="para"></p>
         <select id="shape">
-          <option>L</option>
+          <option value="L">L</option>
           <option>I</option>
           <option>T</option>
           <option>3</option>
@@ -337,7 +339,7 @@ class Board extends React.Component {
           <option>1</option>
         </select>
         <select id="h_or_v">
-          <option>horizontal</option>
+          <option value="horizontal">horizontal</option>
           <option>vertical</option>
         </select>
         <button id="start_game">Start Game</button>

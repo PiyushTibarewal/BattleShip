@@ -169,6 +169,7 @@ nsp.on('connection', function (socket) {
   socket.on('shape_select', function (msg) {
     var blocks = eval(msg['h_or_v']+msg['shape'])[1];
     var pos = eval(msg['h_or_v']+msg['shape'])[0];
+    console.log(pos,msg['h_or_v'],msg['shape'],msg['h_or_v']+msg['shape'],eval(msg['h_or_v']+msg['shape'])[0],msg);
     post.getadd_info(msg['user'], pos, function (result) {
       if (result == 1) {
           nsp.to(socket.id).emit('message to display', "Sorry this ship is already been placed");
@@ -176,21 +177,25 @@ nsp.on('connection', function (socket) {
       else if (result == 0) {
         post.checkBlocks(msg['user'], msg['i'], msg['j'], blocks, function (result1) {
           if (result1==true) {
+            console.log("startin to placeBlocks");
             blocks.forEach ( function (entry) {
-              nsp.to(res).emit('colour_change', { user : msg['user'], i: msg['i']+entry[0], j: msg['j']+entry[1], color: 'brown'});
-              post.setBlockColour(msg['user'], msg['i'], msg['j'], 1);
+              console.log("hwwhw");
+              nsp.to(socket.io).emit('colour_change', { user : msg['user'], i: msg['i']+entry[0], j: msg['j']+entry[1], color: 'brown'});
+              post.setBlockColour(msg['user'], msg['i']+entry[0], msg['j']+entry[1], 1);
             });
             post.setadd_info(msg['user'], pos, 1);
           }
           else {
-              nsp.to(res).emit('message to display', "That's an incorrect position");
+              nsp.to(socket.io).emit('message to display', "That's an incorrect position");
           }
         });
       }
     });
   });
 
-  socket.on('can game be started', function (msg))
+  // socket.on('can game be started', function (msg) {
+  //   // msg[]
+  // });
 
 });
 
