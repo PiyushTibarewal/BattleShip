@@ -318,7 +318,7 @@ nsp.on('connection', function (socket) {
     blocks.forEach(function (entry) {
       x=msg['i']+entry[0];
       y=msg['j']+entry[1];
-      if (x > 1 && x < 8 && y > 1 && y < 8) {
+      if (x >= 1 && x <= 8 && y >= 1 && y <= 8) {
         console.log("Placing Block of ", var_name, " on ", msg['user'], "at ", msg['i'] + entry[0], ",", msg['j'] + entry[1]);
         nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'grey' });  
       }
@@ -372,50 +372,69 @@ nsp.on('connection', function (socket) {
           console.log("PRINTED ERROR: check can game be started in app.js");
         }
       });
-      // nsp.to(socket.id).emit("game_started");
-      // post.getId(msg['opponent'], function (res) {
-      //   nsp.to(res).emit("game_started");
-      //   nsp.to(res).emit("message to display", "Game Started. Your Turn");
-      // });
-      // nsp.to(socket.id).emit("message to display", "Game Started. Opponent's Turn");//For teating purpose
-
     });
 
   socket.on('refreshed game', function (msg) {
     var player = msg['user'];
     var oppo = msg['opponent'];
     console.log("request to retrive board ", msg);
-    nsp.to(socket.id).emit("game_play");
-    post.getPlayerBoard(player, 1, 1, function (playerBoard) {
-      console.log("player board ", playerBoard.length);
-      playerBoard.forEach(function (entry) {
-        if (entry[2] == 1) {
-          nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'brown' });
-          console.log("1");
-        }
-        else if (entry[2] == 2) {
-          nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'red' });
-          console.log("2");
-        }
-        else if (entry[2] == 3) {
-          nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'green' });
-          console.log("3");
-        }
-      });
+    post.getadd_info(player,1,"game started", function (turn) {
+      if (turn==1) {
+        nsp.to(socket.id).emit("game_play");
+        post.getPlayerBoard(player, 1, 1, function (playerBoard) {
+          console.log("player board ", playerBoard.length);
+          playerBoard.forEach(function (entry) {
+            if (entry[2] == 1) {
+              nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'brown' });
+              console.log("1");
+            }
+            else if (entry[2] == 2) {
+              nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'red' });
+              console.log("2");
+            }
+            else if (entry[2] == 3) {
+              nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'green' });
+              console.log("3");
+            }
+          });
+        });
+        post.getPlayerBoard(oppo, 1, 1, function (playerBoard) {
+          playerBoard.forEach(function (entry) {
+            console.log("player board ", playerBoard.length);
+            if (entry[2] == 2) {
+              nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: entry[0], j: entry[1], color: 'green' });
+              console.log("2");
+            }
+            else if (entry[2] == 3) {
+              nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: entry[0], j: entry[1], color: 'red' });
+              console.log("3");
+            }
+          });
+        });
+      }
+      else if (turn == 0) {
+        post.getPlayerBoard(player, 1, 1, function (playerBoard) {
+          playerBoard.forEach(function (entry) {
+            if (entry[2] == 1) {
+              nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'brown' });
+              console.log("1");
+            }
+            else if (entry[2] == 2) {
+              nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'red' });
+              console.log("2");
+            }
+            else if (entry[2] == 3) {
+              nsp.to(socket.id).emit('colour_change', { table: 'user', i: entry[0], j: entry[1], color: 'green' });
+              console.log("3");
+            }
+          });
+        });
+      }
+      else console.log("Major ERROR app.js socket.on refreshed home");
     });
-    post.getPlayerBoard(oppo, 1, 1, function (playerBoard) {
-      playerBoard.forEach(function (entry) {
-        console.log("player board ", playerBoard.length);
-        if (entry[2] == 2) {
-          nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: entry[0], j: entry[1], color: 'green' });
-          console.log("2");
-        }
-        else if (entry[2] == 3) {
-          nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: entry[0], j: entry[1], color: 'red' });
-          console.log("3");
-        }
-      });
-    });
+
+    
+    
   });
 
 });

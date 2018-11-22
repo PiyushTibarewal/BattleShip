@@ -327,7 +327,7 @@ class Board extends React.Component {
       $("#start_game").hide();
       $('#shape').hide();
       $('#h_or_v').hide();
-
+      is_playing=1;
     });
     socket.on('message to display', function (msg) {
       document.getElementById('turn').innerHTML = msg;
@@ -516,7 +516,6 @@ class Chat extends React.Component {
 socket.on("render game as refresh", function (msg) {
   console.log("refreshed game page oppo",msg);
   opponent_name = msg;
-  is_playing=1;
   user_name=sessionStorage.getItem("myusername");
   ReactDOM.render(<Board />,document.getElementById('main'));
   socket.emit("refreshed game",{ user: sessionStorage.getItem("myusername"), opponent: opponent_name });
