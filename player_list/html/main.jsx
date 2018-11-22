@@ -23,7 +23,7 @@ class Signin extends React.Component {
           alert("Provided login credentials are wrong.Please login again.");
         }
         else if (response.data) {
-          localStorage.setItem('myusername', response.data);
+          sessionStorage.setItem('myusername', response.data);
           var ip = 'http://'+window.location.hostname+':7777/home';
           window.location.assign(ip);
         }

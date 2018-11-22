@@ -119,7 +119,7 @@ class LeaderBoard extends React.Component {
             <th>#</th>
             <th>Username</th>
             <th>Games Played</th>
-            <th>Games Won</th>
+            <th>Points</th>
           </tr>
         </thead>
         <tbody>
@@ -168,7 +168,7 @@ class ActivePlayers extends React.Component {
 
   componentDidMount() {
 
-    socket.emit("started-home", localStorage.getItem('myusername'));
+    socket.emit("started-home", sessionStorage.getItem('myusername'));
     document.getElementById('homeHyperlink').className = "active";
     document.getElementById('addHyperLink').className = "";
     document.getElementById('profileHyperlink').className = "";
@@ -182,6 +182,7 @@ class ActivePlayers extends React.Component {
           <tr>
             <th>#</th>
             <th>Username</th>
+            <th></th>
             {/* <th></th>
             <th></th> */}
           </tr>
@@ -189,7 +190,7 @@ class ActivePlayers extends React.Component {
         <tbody>
           {
             this.state.posts.map(function (post, index) {
-              if(post.username != user_name){
+              if (post.username != sessionStorage.getItem('myusername')) {
               return <tr key={index} >
                 <td>{index + 1}</td>
                 <td>{post.username}</td>
@@ -442,6 +443,16 @@ class Chat extends React.Component{
       );
   }
 }
+
+socket.on("render game as refresh", function (msg) {
+  console.log("refreshed game page oppo",msg);
+  opponent_name = msg;
+  is_playing=1;
+  user_name=sessionStorage.getItem("myusername");
+  ReactDOM.render(<Board />,document.getElementById('main'));
+  socket.emit("refreshed game",{ user: sessionStorage.getItem("myusername"), opponent: opponent_name });
+});
+
 socket.on('online-users', function (msg) {
   var result = JSON.stringify(msg);
   var red = JSON.parse(result);

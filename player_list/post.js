@@ -1,6 +1,10 @@
 const db1 = require('./db');
 module.exports = {
 
+	initializeServer : function () {
+		db1.connection.query("update game_user set online='N', is_playing='N'");
+	},
+
 	getUsername: function (id, callback) {
 		console.log("getting username of socid ", id);
 		db1.connection.query("select username from game_user where id=?", [id], (err, rows) => {
@@ -51,7 +55,7 @@ module.exports = {
 
 	getLeaderBoard: function (callback) {
 
-		db1.connection.query("select username,games_played,points from game_user ORDER BY points", (err, rows) => {
+		db1.connection.query("select username,games_played,points from game_user ORDER BY points DESC", (err, rows) => {
 			if (err == null) {
 				console.log("get leaderboard using getLeaderBoard");
 				callback(rows)
@@ -127,21 +131,18 @@ module.exports = {
 		});
 	},
 
-	deletePost: function (id, callback) {
-		db1.connection.query("update game_user set online=?, is_playing=? where username=?", ["N", "N", id], (err, rows) => {
-			if (err == null) {
-				console.log("Deleted the post.", id);
-				callback(true);
-			}
-			else {
-				console.log(" not Deleted the post.");
-				callback(false);
-			}
+	getOpponent: function (user,callback) {
+		db1.connection.query("select opponent from game_user where username=?", [user], (err, rows) => {
+			if (err) throw err;
+			var result = JSON.stringify(rows);
+			var red = JSON.parse(result);
+			var opponent = red[0]['opponent'];
+			callback(opponent);
 		});
 	},
 
 	deletePostSocket: function (id, callback) {
-		db1.connection.query("update game_user set online=?, is_playing=? where id=?", ["N","N", id], (err, rows) => {
+		db1.connection.query("update game_user set online='N' where id=?", [id], (err, rows) => {
 			if (err == null) {
 				console.log("Deleted the post_socket.", id);
 				callback(true);
@@ -205,14 +206,13 @@ module.exports = {
 		callback(true);
 	},
 
-	checkBlock : function (user,row,col,callback) {
+	getBlock : function (user,row,col,callback) {
 		var col_no = 'col_'+col;
 		var sqlq = "select "+col_no+" from "+user+" where row_no=?";// might be an error
 		db1.connection.query(sqlq,[row], (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
 			var check = red[0][col_no];
-			console.log(check,red,result,"hii","col_no",col_no,sqlq);
 			callback(check);
 			console.log(user,"'s opponent tried to hit ",row,",",col,"output=",check);
 		});
@@ -224,7 +224,7 @@ module.exports = {
 			if (err) throw err;
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
-			console.log("inside gameOver",rows,result,red,red.length,sqlq);
+			// console.log("inside gameOver",rows,result,red,red.length,sqlq);
 			if (red.length == 0) {
 				callback(true);
 				console.log("game Over ",user," lost");
@@ -308,6 +308,36 @@ module.exports = {
 			}
 		}
 	},
+
+	getPlayerBoard: function (player, i, j, callback) {
+		if (i != 8 || j != 8) {
+			var hi =this;
+			if ( j != 8 ) {
+				this.getBlock(player, i, j, function (block) {
+					var new_item = [[i,j,block]];
+					hi.getPlayerBoard(player, i, j+1, function (result) {
+						var ne = result.concat(new_item);
+						callback(ne);
+					});
+				});
+			}
+			else {
+				this.getBlock(player, i, j, function (block) {
+					var new_item = [[i,j,block]];
+					hi.getPlayerBoard(player, i+1, 1, function (result) {
+						var ne = result.concat(new_item);
+						callback(ne);
+					});
+				});
+			}
+		}
+		else {
+			this.getBlock(player, i, j, function (block) {
+				var new_item = [[i,j,block]];
+				callback(new_item);
+			});
+		}
+	}
 
 	// checkBlocks : function (user,i,j,Blocks,callback) {
 	// 	var ans = 1;
