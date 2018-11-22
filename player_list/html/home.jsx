@@ -9,6 +9,9 @@ var show = null;
 var leader = null;
 var opponent_name = null;
 var is_playing = 0;
+var time = 30;
+var board = null;
+var mychance = 0;
 // import $ from 'jquery';
 class ShowProfile extends React.Component {
   constructor(props) {
@@ -200,7 +203,7 @@ class ActivePlayers extends React.Component {
                 {/* <td>
                   <span onClick={this.deletePost.bind(this, post.id)} className="glyphicon glyphicon-remove"></span>
                 </td> */}
-              </tr>
+                </tr>
               }
             }.bind(this))
           }
@@ -240,7 +243,22 @@ class ChallengeRequest extends React.Component {
   }
 };
 class Board extends React.Component {
+  constructor() {
+
+    super();
+    this.changetime = this.changetime.bind(this);
+    board = this;
+  }
+  changetime() {
+    time = time - 1;
+    console.log(time);
+    document.getElementById('time').innerHTML = time;
+    if (time == 0 && mychance == 1)
+      socket.emit("time_out", { user: user_name, opponent: opponent_name });
+    var t = setTimeout(this.changetime, 1000);
+  }
   componentDidMount() {
+
     $('td').click(function () {
       var name = $(this).closest('table').attr('id');
 
@@ -266,47 +284,64 @@ class Board extends React.Component {
       }
       //for changing the colour when chance is played;
 
-     });
+    });
 
 
-     $("#start_game").click(function() {
-       socket.emit('can game be started',{user: user_name, opponent: opponent_name});
-     });
+    $("#start_game").click(function () {
+      socket.emit('can game be started', { user: user_name, opponent: opponent_name });
+    });
 
 
-     socket.on("game_play",function(msg){
+    socket.on("game_play", function (msg) {
       $("#start_game").hide();
       $('#shape').hide();
       $('#h_or_v').hide();
-     });
 
-     socket.on('message to display',function(msg){
-       document.getElementById('turn').innerHTML=msg;
-     });
+    });
+    socket.on('message to display', function (msg) {
+      document.getElementById('turn').innerHTML = msg;
+      if (msg == "Game Started. Your Turn")
+        mychance = 1;
+      if (msg == "Your turn")
+        mychance = 1;
+      if (msg == "Opponent's turn")
+        mychance = 0;
+    });
 
-     socket.on("colour_change", function (msg) {
-        console.log(msg);console.log("GERG");
-        var tb = msg['table'];
-        var r = msg['i'];
-        var c = msg['j'];
-        var r2 = Number(r)-1;
-        var c2 = Number(c)-1;
-        var v1 = Number((8 * r2)) + Number(c2);console.log(v1);
-        if (tb == 'user') {
-          var cell1 = $('#user').find("td").eq(v1);console.log(cell1);
-          cell1.css("background-color", msg['color']);
-        }
-        if (tb == 'opponent') {
-          var cell1 = $('#opponent').find("td").eq(v1);console.log(cell1,"opponent cell1");
-          cell1.css("background-color", msg['color']);
-        }
-      });
+    socket.on("colour_change", function (msg) {
+      console.log(msg); console.log("GERG");
+      var tb = msg['table'];
+      var r = msg['i'];
+      var c = msg['j'];
+      var r2 = Number(r) - 1;
+      var c2 = Number(c) - 1;
+      if (msg['color'] != 'brown') {
+        time = 30;
+        document.getElementById('time').innerHTML = time;
 
-      socket.on("game_started", function () {
-        is_playing = 1;
-      });
+      }
+      var v1 = Number((8 * r2)) + Number(c2); console.log(v1);
+      if (tb == 'user') {
+        var cell1 = $('#user').find("td").eq(v1); console.log(cell1);
+        cell1.css("background-color", msg['color']);
+      }
+      if (tb == 'opponent') {
+        var cell1 = $('#opponent').find("td").eq(v1); console.log(cell1, "opponent cell1");
+        cell1.css("background-color", msg['color']);
+      }
+    });
 
-    }
+    socket.on("game_started", function () {
+      is_playing = 1;
+      document.getElementById('time').innerHTML = time;
+      console.log(time);
+      board.changetime();
+      console.log("time");
+      console.log(time);
+
+    });
+
+  }
 
   render() {
     return (
@@ -314,6 +349,7 @@ class Board extends React.Component {
         <div class="card">
           <div class="container">
             <p id="turn"></p>
+            <p id="time"></p>
           </div>
         </div>
         <table summary="" width="40%" height="40%" class="sidexside" id="user">
@@ -356,91 +392,93 @@ class Board extends React.Component {
   }
 }
 class HomePage extends React.Component {
-  render() {return(
-    <div class="container" id="root">
-      <div class="header clearfix">
-        <nav>
-          <ul class="nav nav-pills pull-right">
-            <li role="presentation" id="homeHyperlink" class="active"><a href="#">Home</a></li>
-            <li role="presentation" id="addHyperLink"><a href="/home#/addPost">LeaderBoard</a></li>
-            <li role="presentation" id="profileHyperlink"><a href="/home#/showProfile">Profile</a></li>
-            <li role="presentation" id='logout'><a href="/logout">Logout</a></li>
-          </ul>
-        </nav>
-        <h3 class="text-muted">Battleship</h3>
+  render() {
+    return (
+      <div class="container" id="root">
+        <div class="header clearfix">
+          <nav>
+            <ul class="nav nav-pills pull-right">
+              <li role="presentation" id="homeHyperlink" class="active"><a href="#">Home</a></li>
+              <li role="presentation" id="addHyperLink"><a href="/home#/addPost">LeaderBoard</a></li>
+              <li role="presentation" id="profileHyperlink"><a href="/home#/showProfile">Profile</a></li>
+              <li role="presentation" id='logout'><a href="/logout">Logout</a></li>
+            </ul>
+          </nav>
+          <h3 class="text-muted">Battleship</h3>
+        </div>
+        <div id="app" >
+          <Router history={hashHistory}>
+            <Route component={ActivePlayers} path="/"></Route>
+            <Route component={LeaderBoard} path="/addPost(/:id)"></Route>
+            <Route component={ShowProfile} path="/showProfile"></Route>
+          </Router>
+        </div>
       </div>
-      <div id="app" >
-        <Router history={hashHistory}>
-          <Route component={ActivePlayers} path="/"></Route>
-          <Route component={LeaderBoard} path="/addPost(/:id)"></Route>
-          <Route component={ShowProfile} path="/showProfile"></Route>
-        </Router>
-      </div>
-    </div>
-  );}
+    );
+  }
 }
 
-class Chat extends React.Component{
-  constructor(props){
-      super(props);
+class Chat extends React.Component {
+  constructor(props) {
+    super(props);
 
-      this.state = {
-          username: user_name,
-          message: '',
-          messages: []
-      };
+    this.state = {
+      username: user_name,
+      message: '',
+      messages: []
+    };
 
-       this.socket = socket;
+    this.socket = socket;
 
-      this.socket.on('RECEIVE_MESSAGE', function(data){
-          addMessage(data);
-      });
+    this.socket.on('RECEIVE_MESSAGE', function (data) {
+      addMessage(data);
+    });
 
-      const addMessage = data => {
-          console.log(data);
-          this.setState({messages: [...this.state.messages, data]});
-          console.log(this.state.messages);
-      };
+    const addMessage = data => {
+      console.log(data);
+      this.setState({ messages: [...this.state.messages, data] });
+      console.log(this.state.messages);
+    };
 
-      this.sendMessage = ev => {
-          ev.preventDefault();
-          this.socket.emit('SEND_MESSAGE', {
-              author: user_name,
-              to_send: opponent_name,
-              message: this.state.message
-          })
-          this.setState({message: ''});
+    this.sendMessage = ev => {
+      ev.preventDefault();
+      this.socket.emit('SEND_MESSAGE', {
+        author: user_name,
+        to_send: opponent_name,
+        message: this.state.message
+      })
+      this.setState({ message: '' });
 
-      }
+    }
   }
-  render(){
-      return (
-          <div className="container">
-              <div className="row">
-                  <div className="col-4">
-                      <div className="card">
-                          <div className="card-body">
-                              <div className="card-title">Chat</div>
-                              <hr/>
-                              <div className="messages">
-                                  {this.state.messages.map(message => {
-                                      return (
-                                          <div>{message.author}: {message.message}</div>
-                                      )
-                                  })}
-                              </div>
+  render() {
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col-4">
+            <div className="card">
+              <div className="card-body">
+                <div className="card-title">Chat</div>
+                <hr />
+                <div className="messages">
+                  {this.state.messages.map(message => {
+                    return (
+                      <div>{message.author}: {message.message}</div>
+                    )
+                  })}
+                </div>
 
-                          </div>
-                          <div className="card-footer">
-                              <input type="text" placeholder="Message" className="form-control" value={this.state.message} onChange={ev => this.setState({message: ev.target.value})}/>
-                              <br/>
-                              <button onClick={this.sendMessage} className="btn btn-primary form-control">Send</button>
-                          </div>
-                      </div>
-                  </div>
               </div>
+              <div className="card-footer">
+                <input type="text" placeholder="Message" className="form-control" value={this.state.message} onChange={ev => this.setState({ message: ev.target.value })} />
+                <br />
+                <button onClick={this.sendMessage} className="btn btn-primary form-control">Send</button>
+              </div>
+            </div>
           </div>
-      );
+        </div>
+      </div>
+    );
   }
 }
 
