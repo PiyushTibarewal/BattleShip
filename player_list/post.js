@@ -232,19 +232,19 @@ module.exports = {
 
 	// },
 
-	gameOver : function (user,callback) {
+	gameOver : function (user,callback) {// yaha dikhat he bas
 		var sqlq ="select row_no from "+user+" where col_1 = 1 or col_2 = 1 or col_3 = 1 or col_4 = 1 or col_5 = 1 or col_6 = 1 or col_7 = 1 or col_8 = 1";
 		db1.connection.query(sqlq, (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
 			if (red.length == 0) {
 				callback(true);
+				console.log("game Over ",user," lost");
 			}
 			else {
 				callback(false);
 			}
-		})
-		console.log("game Over ",user," lost");
+		});
 	},
 
 	setBlockColour : function (user,i,j,colour,callback) {

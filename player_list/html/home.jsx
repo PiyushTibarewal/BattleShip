@@ -266,9 +266,13 @@ class Board extends React.Component {
       //for changing the colour when chance is played;
 
      });
+
+
      $("#start_game").click(function() {
        socket.emit('can game be started',{user: user_name, opponent: opponent_name});
      });
+
+
      socket.on("game_play",function(msg){
       $("#start_game").hide();
       $('#shape').hide();
@@ -277,11 +281,9 @@ class Board extends React.Component {
 
      socket.on('message to display',function(msg){
        document.getElementById('turn').innerHTML=msg;
-     })
+     });
 
-     
-
-      socket.on("colour_change", function (msg) {
+     socket.on("colour_change", function (msg) {
         console.log(msg);console.log("GERG");
         var tb = msg['table'];
         var r = msg['i'];
@@ -294,7 +296,7 @@ class Board extends React.Component {
           cell1.css("background-color", msg['color']);
         }
         if (tb == 'opponent') {
-          var cell1 = $('#opponnet').find("td").eq(v1);
+          var cell1 = $('#opponent').find("td").eq(v1);console.log(cell1,"opponent cell1");
           cell1.css("background-color", msg['color']);
         }
       });
@@ -302,6 +304,7 @@ class Board extends React.Component {
       socket.on("game_started", function () {
         is_playing = 1;
       });
+
     }
 
   render() {

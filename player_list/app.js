@@ -195,13 +195,13 @@ nsp.on('connection', function (socket) {
           nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });
           post.setadd_info(msg['opponent'], 2, 1);
           post.setadd_info(msg['user'], 2, 0);
-          post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 3, function () { });
+          post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 3, function () { });// shatad 2 ayega
           nsp.to(result).emit('message to display', "Your turn.");
           nsp.to(socket.id).emit('message to display', "Opponent's turn");
         }
         else if (result1 == 1) {
           nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'green' });
-          nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });
+          nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });// colour pain
           post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 2, function (afterChange) {
             if (afterChange) {
               post.gameOver(msg['opponent'], function (ifOver) {
@@ -278,12 +278,12 @@ nsp.on('connection', function (socket) {
   socket.on('can game be started', function (msg) {
     post.checkGameStart(msg['user'], function (result) {
       if (result == true) {
-        nsp.to(socket.id).emit("game_play"); // complete
+        nsp.to(socket.id).emit("game_play");
         post.getadd_info(msg['opponent'], 2, "turn Block", function (result) {
           if (result == 1) {
             post.setadd_info(msg['user'], 1, 1);
             post.setadd_info(msg['opponent'], 1, 1);
-            nsp.to(socket.io).emit("game_started");
+            nsp.to(socket.id).emit("game_started");
             post.getId(msg['opponent'], function (res) {
               nsp.to(res).emit("game_started");
               nsp.to(res).emit("message to display", "Game Started. Your Turn");
@@ -304,8 +304,6 @@ nsp.on('connection', function (socket) {
       }
     });
   });
-
-  // socket.on('')
 
 });
 
