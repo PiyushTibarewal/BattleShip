@@ -23,7 +23,6 @@ module.exports = {
 	getId: function (username, callback) {
 		db1.connection.query("select id from game_user where username=?", username, (err, rows) => {
 			if (err == null) {
-				console.log("get posts using getpost");
 				var result = JSON.stringify(rows);
 				var red = JSON.parse(result);
 				callback(red[0]['id']);
@@ -39,7 +38,7 @@ module.exports = {
 
 		db1.connection.query("select username from game_user where online=? and is_playing=?", ["Y","N"], (err, rows) => {
 			if (err == null) {
-				console.log("get posts using getpost ", rows);
+				console.log("Online players list request ", rows);
 				callback(rows)
 			}
 			else {
@@ -82,11 +81,12 @@ module.exports = {
 
 	},
 
-	setId: function (id, username) {
+	setId: function (id, username,callback) {
 		console.log("starting to set id of ", username, " to ", id, "in sql request");
 		db1.connection.query("update game_user set online=?,id=? where username=?", ["Y", id, username], (err, rows) => {
 			if (err == null) {
 				console.log("Set the id of ", username, "to", id);
+				callback();
 			}
 			else {
 				console.log(" not able to set the id.");
@@ -98,15 +98,18 @@ module.exports = {
 
 	changePoints: function (username, change) {
 		// console.log("starting to set id of ", username, " to ", id, "in sql request");
-		db1.connection.query("select points from game_user where userrname=?", [username], (error,row) => {
+		db1.connection.query("select points,games_played from game_user where username=?", [username], (error,row) => {
 			var result = JSON.stringify(row);
 			var red = JSON.parse(result);
 			var points = red[0]['points'];
+			var games = red[0]['games_played'];
 			if (change) {
 				points=points+10;
 			}
 			else points=points-5;
-			db1.connection.query("update game_user set points=? where username=?", [points,username])
+			games=games+1;
+			console.log("change points",points,games,result,red,error,username,change);
+			db1.connection.query("update game_user set points=?, is_playing='N', opponent='nil', games_played=? where username=?", [points,games,username]);
 		});
 	},
 
@@ -160,59 +163,46 @@ module.exports = {
 	},
 
 	initializetGame	: function (first,second,callback) {
-		// var sqlq = "select is_playing from game_user where username = '"+first+"' or username = '"+second+"'";
-		// db1.connection.query(sqlq, (err, rows) => {
-		// 	var result = JSON.stringify(rows);
-		// 	console.log(result,rows,sqlq);// debug
-		// 	var red = JSON.parse(result);
-		// 	var check1 = red[0]['is_playing'];
-		// 	var check2 = red[1]['is_playing'];
-		// 	if (check1 == "N" && check2 == "N") {
-				var sqlq1 = "create table "+first+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
-				db1.connection.query(sqlq1, (err,row) => {
-					var sqlq11 = "insert into "+first+" (row_no) values (1)";
-					var sqlq12 = "insert into "+first+" (row_no) values (2)";
-					var sqlq13 = "insert into "+first+" (row_no) values (3)";
-					var sqlq14 = "insert into "+first+" (row_no) values (4)";
-					var sqlq15 = "insert into "+first+" (row_no) values (5)";
-					var sqlq16 = "insert into "+first+" (row_no) values (6)";
-					var sqlq17 = "insert into "+first+" (row_no) values (7)";
-					var sqlq18 = "insert into "+first+" (row_no) values (8)";
-					db1.connection.query(sqlq11, (e,r) => {});
-					db1.connection.query(sqlq12, (e,r) => {});
-					db1.connection.query(sqlq13, (e,r) => {});
-					db1.connection.query(sqlq14, (e,r) => {});
-					db1.connection.query(sqlq15, (e,r) => {});
-					db1.connection.query(sqlq16, (e,r) => {});
-					db1.connection.query(sqlq17, (e,r) => {});
-					db1.connection.query(sqlq18, (e,r) => {});
-				});
-				var sqlq2 = "create table "+second+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
-				db1.connection.query(sqlq2, (err,row) => {
-					var sqlq21 = "insert into "+second+" (row_no) values (1)";
-					var sqlq22 = "insert into "+second+" (row_no) values (2)";
-					var sqlq23 = "insert into "+second+" (row_no) values (3)";
-					var sqlq24 = "insert into "+second+" (row_no) values (4)";
-					var sqlq25 = "insert into "+second+" (row_no) values (5)";
-					var sqlq26 = "insert into "+second+" (row_no) values (6)";
-					var sqlq27 = "insert into "+second+" (row_no) values (7)";
-					var sqlq28 = "insert into "+second+" (row_no) values (8)";
-					db1.connection.query(sqlq21, (e,r) => {});
-					db1.connection.query(sqlq22, (e,r) => {});
-					db1.connection.query(sqlq23, (e,r) => {});
-					db1.connection.query(sqlq24, (e,r) => {});
-					db1.connection.query(sqlq25, (e,r) => {});
-					db1.connection.query(sqlq26, (e,r) => {});
-					db1.connection.query(sqlq27, (e,r) => {});
-					db1.connection.query(sqlq28, (e,r) => {});
-				});
-				console.log("Inititalized game between ", first, " and ", second);
-				callback(true);
-			// }
-			// else {
-			// 	callback(false);
-			// }
-		// });
+		var sqlq1 = "create table "+first+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
+		db1.connection.query(sqlq1, (err,row) => {
+			var sqlq11 = "insert into "+first+" (row_no) values (1)";
+			var sqlq12 = "insert into "+first+" (row_no) values (2)";
+			var sqlq13 = "insert into "+first+" (row_no) values (3)";
+			var sqlq14 = "insert into "+first+" (row_no) values (4)";
+			var sqlq15 = "insert into "+first+" (row_no) values (5)";
+			var sqlq16 = "insert into "+first+" (row_no) values (6)";
+			var sqlq17 = "insert into "+first+" (row_no) values (7)";
+			var sqlq18 = "insert into "+first+" (row_no) values (8)";
+			db1.connection.query(sqlq11, (e,r) => {});
+			db1.connection.query(sqlq12, (e,r) => {});
+			db1.connection.query(sqlq13, (e,r) => {});
+			db1.connection.query(sqlq14, (e,r) => {});
+			db1.connection.query(sqlq15, (e,r) => {});
+			db1.connection.query(sqlq16, (e,r) => {});
+			db1.connection.query(sqlq17, (e,r) => {});
+			db1.connection.query(sqlq18, (e,r) => {});
+		});
+		var sqlq2 = "create table "+second+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
+		db1.connection.query(sqlq2, (err,row) => {
+			var sqlq21 = "insert into "+second+" (row_no) values (1)";
+			var sqlq22 = "insert into "+second+" (row_no) values (2)";
+			var sqlq23 = "insert into "+second+" (row_no) values (3)";
+			var sqlq24 = "insert into "+second+" (row_no) values (4)";
+			var sqlq25 = "insert into "+second+" (row_no) values (5)";
+			var sqlq26 = "insert into "+second+" (row_no) values (6)";
+			var sqlq27 = "insert into "+second+" (row_no) values (7)";
+			var sqlq28 = "insert into "+second+" (row_no) values (8)";
+			db1.connection.query(sqlq21, (e,r) => {});
+			db1.connection.query(sqlq22, (e,r) => {});
+			db1.connection.query(sqlq23, (e,r) => {});
+			db1.connection.query(sqlq24, (e,r) => {});
+			db1.connection.query(sqlq25, (e,r) => {});
+			db1.connection.query(sqlq26, (e,r) => {});
+			db1.connection.query(sqlq27, (e,r) => {});
+			db1.connection.query(sqlq28, (e,r) => {});
+		});
+		console.log("Inititalized game between ", first, " and ", second);
+		callback(true);
 	},
 
 	checkBlock : function (user,row,col,callback) {
@@ -228,15 +218,13 @@ module.exports = {
 		});
 	},
 
-	// shipSunk : function () {
-
-	// },
-
 	gameOver : function (user,callback) {// yaha dikhat he bas
 		var sqlq ="select row_no from "+user+" where col_1 = 1 or col_2 = 1 or col_3 = 1 or col_4 = 1 or col_5 = 1 or col_6 = 1 or col_7 = 1 or col_8 = 1";
 		db1.connection.query(sqlq, (err,rows) => {
+			if (err) throw err;
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
+			console.log("inside gameOver",rows,result,red,red.length,sqlq);
 			if (red.length == 0) {
 				callback(true);
 				console.log("game Over ",user," lost");
@@ -254,8 +242,8 @@ module.exports = {
 		db1.connection.query(sqlq,[colour,i], (err,rows) => {
 			if (err) throw err;
 			console.log(col_no,i,colour,user,"yo");
+			callback(true);
 		});
-		callback(true);
 	},
 
 	setadd_info : function (user, i, val) {

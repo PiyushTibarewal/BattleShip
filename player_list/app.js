@@ -116,10 +116,11 @@ nsp.on('connection', function (socket) {
     }
     nsp.to(socket.id).emit('set-username', sessions.username);
 
-    post.setId(socket.id, sessions.username);
-    post.getPost(function (result) {
-      console.log("started-home ", result);
-      nsp.emit('online-users', result);
+    post.setId(socket.id, sessions.username, function () {
+      post.getPost(function (result) {
+        console.log("started-home ", result);
+        nsp.emit('online-users', result);
+      });
     });
   });
 
@@ -187,46 +188,52 @@ nsp.on('connection', function (socket) {
   );
 
   socket.on('chance_played', function (msg) {
-    post.getId(msg['opponent'], function (result) {
-      post.checkBlock(msg['opponent'], msg['i'], msg['j'], function (result1) {
-        console.log("chance played ",result1);
-        if (result1 == 0) {
-          nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'green' });
-          nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });
-          post.setadd_info(msg['opponent'], 2, 1);
-          post.setadd_info(msg['user'], 2, 0);
-          post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 3, function () { });// shatad 2 ayega
-          nsp.to(result).emit('message to display', "Your turn.");
-          nsp.to(socket.id).emit('message to display', "Opponent's turn");
-        }
-        else if (result1 == 1) {
-          nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'green' });
-          nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });// colour pain
-          post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 2, function (afterChange) {
-            if (afterChange) {
-              post.gameOver(msg['opponent'], function (ifOver) {
-                if (ifOver) {
-                  nsp.to(socket.id).emit('message to display', "You Won.");
-                  nsp.to(result).emit('message to display', "You lost. Better luck next time.");
-                  post.changePoints(msg['user'], true);
-                  post.changePoints(msg['opponent'], false);
-                  nsp.to(socket.id).emit("render-home");
-                  nsp.to(result).emit("render-home");
+    console.log("Received Chance Played req",msg);
+    post.getadd_info(msg['user'],2,"checking turn", function (reso) {
+      if (reso==1) {
+        post.getId(msg['opponent'], function (result) {
+          post.checkBlock(msg['opponent'], msg['i'], msg['j'], function (result1) {
+            console.log("chance played ",result1);
+            if (result1 == 0) {
+              nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'green' });
+              nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'red' });
+              post.setadd_info(msg['opponent'], 2, 1);
+              post.setadd_info(msg['user'], 2, 0);
+              post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 3, function () {});
+              nsp.to(result).emit('message to display', "Your turn.");
+              nsp.to(socket.id).emit('message to display', "Opponent's turn");
+            }
+            else if (result1 == 1) {
+              nsp.to(result).emit('colour_change', { table: 'user', i: msg['i'], j: msg['j'], color: 'red' });
+              nsp.to(socket.id).emit('colour_change', { table: 'opponent', i: msg['i'], j: msg['j'], color: 'green' });// colour pain
+              post.setBlockColour(msg['opponent'], msg['i'], msg['j'], 2, function (afterChange) {
+                if (afterChange) {
+                  post.gameOver(msg['opponent'], function (ifOver) {
+                    if (ifOver) {
+                      nsp.to(socket.id).emit('message to display', "You Won.");
+                      nsp.to(result).emit('message to display', "You lost. Better luck next time.");
+                      post.changePoints(msg['user'], true);
+                      post.changePoints(msg['opponent'], false);
+                      nsp.to(socket.id).emit("render-home");
+                      nsp.to(result).emit("render-home");
+                      console.log("Match Over ",msg['user']," won ",msg['opponent'],"lost");
+                    }
+                    else {
+                      nsp.to(socket.id).emit('message to display', "Nice move. Your turn again.");
+                      nsp.to(result).emit('message to display', "Opponent attacked correctly. Opponent's turn");
+                    }
+                  });
                 }
-                else {
-                  nsp.to(socket.id).emit('message to display', "Nice move. Your turn again.");
-                  nsp.to(result).emit('message to display', "Opponent attacked correctly. Opponent's turn");
-                }
-              })
+              });
+              nsp.to(socket.id).emit('message to display', "Your turn.");
+              nsp.to(result).emit('message to display', "Opponent's turn");
+            }
+            else {
+              nsp.to(socket.id).emit('message to display', "Sorry, can't play here again.");
             }
           });
-          nsp.to(socket.id).emit('message to display', "Your turn.");
-          nsp.to(result).emit('message to display', "Opponent's turn");
-        }
-        else {
-          nsp.to(socket.id).emit('message to display', "Sorry, can't play here again.");
-        }
-      });
+        });    
+      }
     });
   });
 
@@ -237,10 +244,10 @@ nsp.on('connection', function (socket) {
     });
     post.deletePostSocket(socket.id, function (result) {
       console.log("result of delete post", result);
-    });
-    post.getPost(function (result) {
-      console.log("disconnect", result);
-      nsp.emit('online-users', result);
+      post.getPost(function (result) {
+        console.log("disconnect", result);
+        nsp.emit('online-users', result);
+      });
     });
   });
 
