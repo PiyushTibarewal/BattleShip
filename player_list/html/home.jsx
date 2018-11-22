@@ -286,6 +286,37 @@ class Board extends React.Component {
 
     });
 
+    $('td').hover(function () {
+      var name = $(this).closest('table').attr('id');
+
+      var c = $(this).parent().children().index($(this));
+      var r = $(this).parent().parent().children().index($(this).parent());
+      if (is_playing == 0) {
+        var a = $('#shape').val();
+        console.log(a);
+        var b = $('#h_or_v').val();
+        console.log(b);
+        if (name == 'user') {
+          socket.emit("hover_in", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
+        }
+      }
+      //emit when hovering over i,j 
+   },function () {
+    var name = $(this).closest('table').attr('id');
+
+    var c = $(this).parent().children().index($(this));
+    var r = $(this).parent().parent().children().index($(this).parent());
+    if (is_playing == 0) {
+      var a = $('#shape').val();
+      console.log(a);
+      var b = $('#h_or_v').val();
+      console.log(b);
+      if (name == 'user') {
+        socket.emit("hover_out", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
+      }
+    }
+    //emit when hovering over i,j 
+ });
 
     $("#start_game").click(function () {
       socket.emit('can game be started', { user: user_name, opponent: opponent_name });

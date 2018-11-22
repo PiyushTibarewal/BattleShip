@@ -242,7 +242,7 @@ nsp.on('connection', function (socket) {
                       post.changePoints(msg['opponent'], false);
                       post.dropTable(msg['user'], function () { });
                       post.dropTable(msg['opponent'], function () { });
-                      s                      nsp.to(socket.id).emit("render-home");
+                      nsp.to(socket.id).emit("render-home");
                       nsp.to(result).emit("render-home");
                       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
                     }
@@ -311,42 +311,75 @@ nsp.on('connection', function (socket) {
     });
   });
 
-  socket.on('can game be started', function (msg) {
-    post.checkGameStart(msg['user'], function (result) {
-      if (result == true) {
-        nsp.to(socket.id).emit("game_play");
-        post.getadd_info(msg['opponent'], 2, "turn Block", function (result) {
-          if (result == 1) {
-            post.setadd_info(msg['user'], 1, 1);
-            post.setadd_info(msg['opponent'], 1, 1);
-            nsp.to(socket.id).emit("game_started");
-            post.getId(msg['opponent'], function (res) {
-              nsp.to(res).emit("game_started");
-              nsp.to(res).emit("message to display", "Game Started. Your Turn");
-            });
-            nsp.to(socket.id).emit("message to display", "Game Started. Opponent's Turn");
-          }
-          else if (result == 0) {
-            post.setadd_info(msg['user'], 2, 1);
-            nsp.to(socket.id).emit("message to display", "Opponent hasn't Placed his Blocks. Waiting for him");
-          }
-        });
-      }
-      else if (result == false) {
-        nsp.to(socket.id).emit("message to display", "Place all the Blocks for match to be started");
-      }
-      else {
-        console.log("PRINTED ERROR: check can game be started in app.js");
+  socket.on('hover_in', function (msg) {
+    var var_name = msg['h_or_v'] + msg['shape'];
+    var blocks = eval(var_name)[1];
+    console.log("request of user", msg['user'], " to place shape ", var_name, "at i,j:", msg['i'], msg['j']);
+    blocks.forEach(function (entry) {
+      x=msg['i']+entry[0];
+      y=msg['j']+entry[1];
+      if (x > 1 && x < 8 && y > 1 && y < 8) {
+        console.log("Placing Block of ", var_name, " on ", msg['user'], "at ", msg['i'] + entry[0], ",", msg['j'] + entry[1]);
+        nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'grey' });  
       }
     });
-    // nsp.to(socket.id).emit("game_started");
-    // post.getId(msg['opponent'], function (res) {
-    //   nsp.to(res).emit("game_started");
-    //   nsp.to(res).emit("message to display", "Game Started. Your Turn");
-    // });
-    // nsp.to(socket.id).emit("message to display", "Game Started. Opponent's Turn");//For teating purpose
-
   });
+  socket.on('hover_out', function (msg) {
+    var var_name = msg['h_or_v'] + msg['shape'];
+    var blocks = eval(var_name)[1];
+    console.log("request of user", msg['user'], " to place shape ", var_name, "at i,j:", msg['i'], msg['j']);
+    blocks.forEach(function (entry) {
+      x=msg['i']+entry[0];
+      y=msg['j']+entry[1];
+      if (x >= 1 && x <= 8 && y >= 1 && y <= 8) {
+        post.getBlock(msg['user'],msg['i']+entry[0],msg['j']+entry[1],function (val) {
+          console.log("Placing Block of ", var_name, " on ", msg['user'], "at ", msg['i'] + entry[0], ",", msg['j'] + entry[1]);
+          if (val == 0) {
+            nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'white' });
+          }
+          else if (val == 1) {
+            nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'brown' });
+          }  
+        });
+      }
+    });
+  });
+  socket.on('can game be started', function (msg) {
+      post.checkGameStart(msg['user'], function (result) {
+        if (result == true) {
+          nsp.to(socket.id).emit("game_play");
+          post.getadd_info(msg['opponent'], 2, "turn Block", function (result) {
+            if (result == 1) {
+              post.setadd_info(msg['user'], 1, 1);
+              post.setadd_info(msg['opponent'], 1, 1);
+              nsp.to(socket.id).emit("game_started");
+              post.getId(msg['opponent'], function (res) {
+                nsp.to(res).emit("game_started");
+                nsp.to(res).emit("message to display", "Game Started. Your Turn");
+              });
+              nsp.to(socket.id).emit("message to display", "Game Started. Opponent's Turn");
+            }
+            else if (result == 0) {
+              post.setadd_info(msg['user'], 2, 1);
+              nsp.to(socket.id).emit("message to display", "Opponent hasn't Placed his Blocks. Waiting for him");
+            }
+          });
+        }
+        else if (result == false) {
+          nsp.to(socket.id).emit("message to display", "Place all the Blocks for match to be started");
+        }
+        else {
+          console.log("PRINTED ERROR: check can game be started in app.js");
+        }
+      });
+      // nsp.to(socket.id).emit("game_started");
+      // post.getId(msg['opponent'], function (res) {
+      //   nsp.to(res).emit("game_started");
+      //   nsp.to(res).emit("message to display", "Game Started. Your Turn");
+      // });
+      // nsp.to(socket.id).emit("message to display", "Game Started. Opponent's Turn");//For teating purpose
+
+    });
 
   socket.on('refreshed game', function (msg) {
     var player = msg['user'];
