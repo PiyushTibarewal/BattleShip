@@ -242,7 +242,7 @@ nsp.on('connection', function (socket) {
                       post.changePoints(msg['opponent'], false);
                       post.dropTable(msg['user'], function () { });
                       post.dropTable(msg['opponent'], function () { });
-                      s                      nsp.to(socket.id).emit("render-home");
+                      nsp.to(socket.id).emit("render-home");
                       nsp.to(result).emit("render-home");
                       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
                     }
