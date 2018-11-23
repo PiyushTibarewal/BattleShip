@@ -332,7 +332,7 @@ class Board extends React.Component {
             <p id="time"></p>
           </div>
         </div>
-        <table summary="" width="40%" height="40%" class="sidexside" id="user">
+        <table summary="" width="300px" height="300px" className="sidexside" id="user">
           <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
           <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -342,7 +342,7 @@ class Board extends React.Component {
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         </table>
-        <table summary="" width="40%" height="40%" class="sidexside" id="opponent">
+        <table summary="" width="300px" height="300px" className="sidexside" id="opponent">
           <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
           <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>

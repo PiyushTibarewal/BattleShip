@@ -63,8 +63,7 @@ module.exports = {
 			var str1 = JSON.stringify(result);
 			console.log(result,str1,username,password);
 			var json = JSON.parse(str1);
-			var on = json[0]['online'];
-			if (json.length == 1 &&  on == 'N' && err == null) {
+			if (json.length == 1 &&  json[0]['online'] == 'N' && err == null) {
 				db1.connection.query("update game_user set online=? where username=?", ["Y", username], (e, r) => {
 					if (e == null) {
 						console.log('returning true for validatesignin')
@@ -76,7 +75,7 @@ module.exports = {
 					}
 				});
 			}
-			else if (json.length == 1 && on=='Y' && err==null) {
+			else if (json.length == 1 && json[0]['online']=='Y' && err==null) {
 				callback(2);
 			}
 			else {

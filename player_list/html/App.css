@@ -162,6 +162,7 @@ table, td
     left: -50%; 
     width: 200%; 
     height: 200%;
+    z-index: -1;
   }
   #bg img {
     position: absolute; 
@@ -179,6 +180,7 @@ table, td
     left: -50%; 
     width: 200%; 
     height: 200%;
+    z-index: -1;
   }
   #bg1 img {
     position: absolute; 

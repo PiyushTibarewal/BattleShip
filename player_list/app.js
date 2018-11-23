@@ -409,7 +409,7 @@ nsp.on('connection', function (socket) {
         post.getBlock(msg['user'], msg['i'] + entry[0], msg['j'] + entry[1], function (val) {
           console.log("Placing Block of ", var_name, " on ", msg['user'], "at ", msg['i'] + entry[0], ",", msg['j'] + entry[1]);
           if (val == 0) {
-            nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'white' });
+            nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'rgba(0,0,0,0)' });
           }
           else if (val == 1) {
             nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'brown' });

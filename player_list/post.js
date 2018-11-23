@@ -239,7 +239,11 @@ module.exports = {
 		db1.connection.query(sqlq,[row], (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
+			console.log("checkig username",user);
+			console.log("checking col_no",col_no);
+			console.log("checking red",red);
 			var check = red[0][col_no];
+			console.log("checking check",check);
 			callback(check);
 			console.log(user,"'s opponent tried to hit ",row,",",col,"output=",check);
 		});
