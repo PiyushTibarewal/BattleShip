@@ -467,6 +467,48 @@ class Chat extends React.Component {
   }
 }
 
+class Congrats extends React.Component{
+  constructor(){
+    super();
+
+  }
+  render () {
+    return ( 
+      <div id="congrats"> 
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<h2>Congratulations You Won!</h2>
+
+
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+
+</div>
+    );
+  }
+}
+
+
 socket.on("render game as refresh", function (msg) {
   console.log("refreshed game page oppo",msg);
   opponent_name = msg;
