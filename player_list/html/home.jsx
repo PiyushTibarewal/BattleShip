@@ -105,13 +105,15 @@ class ActivePlayers extends React.Component {
     $('#'+username).find(".rqst").html("request send");
   }
   player_profile(username){
+    console.log("give player info",username);
     socket.emit("give player info",username);
   }
 
   changePost(msg) {
     this.setState({ posts: msg });
   }
-
+  
+  
   componentDidMount() {
 
     socket.emit("started-home", sessionStorage.getItem('myusername'));
@@ -120,11 +122,17 @@ class ActivePlayers extends React.Component {
     document.getElementById('profileHyperlink').className = "";
     socket.on("display player info",function(msg){
       console.log(msg);
+      console.log("YO");
       $("#"+msg['username']).find(".g_p").html(msg['games_played']);
       $("#"+msg['username']).find(".po").html(msg['points']);
       $("#"+msg['username']).toggleClass('hidden');
     });
+    socket.on('request declined sendby', function (msg) {
+      console.log("declined request",msg);
     
+
+      $('#'+msg).find(".rqst").html("Sorry! "+msg+" declined your request.");
+    });
   }
 
   render() {
@@ -385,17 +393,17 @@ class Board extends React.Component {
 class HomePage extends React.Component {
   render() {
     return (
-      <div class="container" id="root">
-        <div class="header clearfix">
+      <div className="container" id="root">
+        <div className="header clearfix">
           <nav>
-            <ul class="nav nav-pills pull-right">
+            <ul className="nav nav-pills pull-right">
               <li role="presentation" id="homeHyperlink" class="active"><a href="#">Home</a></li>
               <li role="presentation" id="addHyperLink"><a href="/home#/leaderboard">LeaderBoard</a></li>
               <li role="presentation" id="profileHyperlink"><a href="/home#/rules">Rules Book</a></li>
               <li role="presentation" id='logout'><a href="/logout">Logout</a></li>
             </ul>
           </nav>
-          <h3 class="text-muted">Battleship</h3>
+          <h3 className="text-muted">Battleship</h3>
         </div>
         <div id="app" >
           <Router history={hashHistory}>
@@ -512,9 +520,6 @@ socket.on('start-game', function (msg) {
   ReactDOM.render(<Board />, document.getElementById('main'));
 });
 
-socket.on('request declined sendby', function (msg) {
-  alert("Sorry! " + msg + " declined your challenge request");
-});
 
 socket.on('set-username', function (msg) {
   user_name = msg; console.log('wefwwfcw', msg);
