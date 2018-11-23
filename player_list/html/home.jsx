@@ -12,7 +12,6 @@ var is_playing = 0;
 var time = 5;
 var board = null;
 var mychance = 0;
-var p=true;
 class RuleBook extends React.Component {
  
   componentDidMount() {
@@ -38,13 +37,23 @@ class LeaderBoard extends React.Component {
       posts: [],
     };
     leader = this;
+    this.url = 'http://'+window.location.hostname+':7777/hidden_masters.mp3';
+    this.audio = new Audio(this.url);
+
+    this.url1 = "http://192.168.0.105:7777/Sounds/mouse_click.mp3";
+    this.audio1 = new Audio(this.url1);
+
   }
 
   changeLeader(msg) {
     this.setState({ posts: msg });
   }
 
+  
   componentDidMount() {
+    this.audio1.play();
+    // this.audio.play();
+    
     socket.emit("started-leaderboard", "challenge accepted");
     document.getElementById('homeHyperlink').className = "";
     document.getElementById('addHyperLink').className = "active";
@@ -119,11 +128,8 @@ class ActivePlayers extends React.Component {
       console.log("YO");
       $("#"+msg['username']).find(".g_p").html(msg['games_played']);
       $("#"+msg['username']).find(".po").html(msg['points']);
-      if(p){ p=false;//Socket called twice here.
       $("#"+msg['username']).toggleClass('hidden');
-    }
-    setTimeout(function(){p=true},500);
-  });
+    });
     socket.on('request declined sendby', function (msg) {
       console.log("declined request",msg);
     
@@ -466,48 +472,6 @@ class Chat extends React.Component {
     );
   }
 }
-
-class Congrats extends React.Component{
-  constructor(){
-    super();
-
-  }
-  render () {
-    return ( 
-      <div id="congrats"> 
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<h2>Congratulations You Won!</h2>
-
-
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-
-</div>
-    );
-  }
-}
-
 
 socket.on("render game as refresh", function (msg) {
   console.log("refreshed game page oppo",msg);
