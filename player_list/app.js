@@ -205,7 +205,6 @@ nsp.on('connection', function (socket) {
           post.getUsername(socket.id, function (result2) { nsp.to(result).emit("request declined sendby", result2); });
       });
     });
-    nsp.to(socket.id).emit("render-home");
     nsp.to(socket.id).emit("render-home");//Rendered twice to solve the toggle problem. ReactDom stores home twice,so not rendering. Populating ReactDOM with home thrice.
   });
 
@@ -222,8 +221,6 @@ nsp.on('connection', function (socket) {
       post.changePoints(msg['user'], 10);
       post.changePoints(msg['opponent'], -5);
       nsp.to(socket.id).emit("render-home");
-      nsp.to(socket.id).emit("render-home");
-      nsp.to(result).emit("render-home");
       nsp.to(result).emit("render-home");
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
     });
@@ -235,8 +232,6 @@ nsp.on('connection', function (socket) {
       nsp.to(result).emit('message to display', "Opponenet Left. Congratulation, you won.");
       post.changePoints(msg['user'], 5);
       post.changePoints(msg['opponent'], -5);
-      nsp.to(socket.id).emit("render-home");
-      nsp.to(result).emit("render-home");
       nsp.to(socket.id).emit("render-home");
       nsp.to(result).emit("render-home");
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
@@ -279,8 +274,6 @@ nsp.on('connection', function (socket) {
                       post.changePoints(msg['opponent'], -5);
                       post.dropTable(msg['user'], function () { });
                       post.dropTable(msg['opponent'], function () { });
-                      nsp.to(socket.id).emit("render-home");
-                      nsp.to(result).emit("render-home");
                       nsp.to(socket.id).emit("render-home");
                       nsp.to(result).emit("render-home");
                       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
@@ -328,7 +321,6 @@ nsp.on('connection', function (socket) {
                     nsp.to(result2).emit('message to display', "Opponenet Left. Congratulation, you won.");
                     post.changePoints(result, -5);
                     post.changePoints(opponent, 5);
-                    nsp.to(result2).emit("render-home");
                     nsp.to(result2).emit("render-home");
                     console.log("Match Over ", result, " won ", opponent, "lost");
                   });
