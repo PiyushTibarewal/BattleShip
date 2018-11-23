@@ -12,6 +12,7 @@ var is_playing = 0;
 var time = 5;
 var board = null;
 var mychance = 0;
+var p=true;
 class RuleBook extends React.Component {
  
   componentDidMount() {
@@ -118,8 +119,11 @@ class ActivePlayers extends React.Component {
       console.log("YO");
       $("#"+msg['username']).find(".g_p").html(msg['games_played']);
       $("#"+msg['username']).find(".po").html(msg['points']);
+      if(p){ p=false;//Socket called twice here.
       $("#"+msg['username']).toggleClass('hidden');
-    });
+    }
+    setTimeout(function(){p=true},500);
+  });
     socket.on('request declined sendby', function (msg) {
       console.log("declined request",msg);
     
