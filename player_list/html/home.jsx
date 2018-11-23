@@ -136,7 +136,7 @@ class ActivePlayers extends React.Component {
   render() {
 
     return (
-    <div><p align="center"><b>Username</b></p>
+    <div><center><p><b>Active Players</b></p></center>
         <div  id="accordion">
           {
             this.state.posts.map(function (post, index) {
