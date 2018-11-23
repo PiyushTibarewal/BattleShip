@@ -12,10 +12,7 @@ var is_playing = 0;
 var time = 5;
 var board = null;
 var mychance = 0;
-<<<<<<< HEAD
-=======
 var p = true;
->>>>>>> origin/game_implementation
 class RuleBook extends React.Component {
 
   componentDidMount() {
@@ -224,6 +221,8 @@ class Board extends React.Component {
     var t = setTimeout(this.changetime, 1000);
   }
   componentDidMount() {
+    document.getElementById('time').innerHTML = time;
+    document.getElementById('turn').innerHTML = "May the odds be in your favour!";
 
     $('td').click(function () {
       var name = $(this).closest('table').attr('id');
