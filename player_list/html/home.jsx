@@ -9,7 +9,7 @@ var show = null;
 var leader = null;
 var opponent_name = null;
 var is_playing = 0;
-var time = 30;
+var time = 5;
 var board = null;
 var mychance = 0;
 // import $ from 'jquery';
@@ -315,7 +315,7 @@ class Board extends React.Component {
         socket.emit("hover_out", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
       }
     }
-    //emit when hovering over i,j 
+    //emit when hovering out of i,j 
  });
 
     $("#start_game").click(function () {
@@ -346,10 +346,11 @@ class Board extends React.Component {
       var c = msg['j'];
       var r2 = Number(r) - 1;
       var c2 = Number(c) - 1;
-      if (msg['color'] != 'brown') {
-        time = 30;
+      if (msg['color'] != 'brown' && msg['color'] != 'grey' && msg['color'] != 'white' && msg['color'] != 'black') {
+        if(mychance==1)
+          socket.emit('update-total-time',{ total_time : Number(time), user: user_name, opponent: opponent_name });
+        time = 5;
         document.getElementById('time').innerHTML = time;
-
       }
       var v1 = Number((8 * r2)) + Number(c2); console.log(v1);
       if (tb == 'user') {
@@ -369,9 +370,7 @@ class Board extends React.Component {
       board.changetime();
       console.log("time");
       console.log(time);
-
     });
-
   }
 
   render() {

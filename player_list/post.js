@@ -100,19 +100,16 @@ module.exports = {
 		});
 	},
 
-	changePoints: function (username, change) {
+	changePoints: function (username, val) {
 		// console.log("starting to set id of ", username, " to ", id, "in sql request");
 		db1.connection.query("select points,games_played from game_user where username=?", [username], (error,row) => {
 			var result = JSON.stringify(row);
 			var red = JSON.parse(result);
 			var points = red[0]['points'];
 			var games = red[0]['games_played'];
-			if (change) {
-				points=points+10;
-			}
-			else points=points-5;
+				points=points+Number(val);
 			games=games+1;
-			console.log("change points",points,games,result,red,error,username,change);
+			console.log("change points",points,games,result,red,error,username,val);
 			db1.connection.query("update game_user set points=?, is_playing='N', opponent='nil', games_played=? where username=?", [points,games,username]);
 		});
 	},
@@ -164,7 +161,7 @@ module.exports = {
 	},
 
 	initializetGame	: function (first,second,callback) {
-		var sqlq1 = "create table "+first+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
+		var sqlq1 = "create table "+first+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info_1 INT default 0,add_info_2 INT default 0)";
 		db1.connection.query(sqlq1, (err,row) => {
 			var sqlq11 = "insert into "+first+" (row_no) values (1)";
 			var sqlq12 = "insert into "+first+" (row_no) values (2)";
@@ -183,7 +180,7 @@ module.exports = {
 			db1.connection.query(sqlq17, (e,r) => {});
 			db1.connection.query(sqlq18, (e,r) => {});
 		});
-		var sqlq2 = "create table "+second+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
+		var sqlq2 = "create table "+second+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info_1 INT default 0,add_info_2 INT default 0)";
 		db1.connection.query(sqlq2, (err,row) => {
 			var sqlq21 = "insert into "+second+" (row_no) values (1)";
 			var sqlq22 = "insert into "+second+" (row_no) values (2)";
@@ -246,18 +243,18 @@ module.exports = {
 		});
 	},
 
-	setadd_info : function (user, i, val) {
-		var sqlq = "update "+user+" set add_info=? where row_no=?";
+	setadd_info : function (user, i, val,col) {
+		var sqlq = "update "+user+" set add_info_"+col+"=? where row_no=?";
 		db1.connection.query(sqlq,[val,i], (err,rows) => {if (err) throw err});
 		console.log("updated add_info of u,i",user,i);
 	},
 
-	getadd_info : function (user, i, shape, callback) {
-		var sqlq = "select add_info from "+user+" where row_no=?";
+	getadd_info : function (user, i, shape,col, callback) {
+		var sqlq = "select add_info_"+col+" from "+user+" where row_no=?";
 		db1.connection.query(sqlq,[i], (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
-			var check = red[0]['add_info'];
+			var check = red[0]['add_info_'+col];
 			console.log("retriving getaddd_info of user,i,shape:",user,i,shape," return check :",check);
 			callback(check);
 		});
@@ -265,7 +262,7 @@ module.exports = {
 
 	checkGameStart : function (user, callback) {
 		console.log("checking if all ships are placed in sea grid of ",user);
-		var sqlq = "select row_no from "+user+" where row_no>2 and add_info=1";
+		var sqlq = "select row_no from "+user+" where row_no>2 and add_info_1=1";
 		db1.connection.query(sqlq, (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
