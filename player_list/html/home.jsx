@@ -608,7 +608,16 @@ class Congrats extends React.Component{
   }
 }
 
-
+socket.on('render-won', function () {
+  time = 5;
+  ReactDOM.render(<Congrats />,
+    document.getElementById('main'));
+});
+socket.on('render-lost', function () {
+  time = 5;
+  ReactDOM.render(<Congrats />,
+    document.getElementById('main'));
+});
 socket.on("render game as refresh", function (msg) {
   console.log("refreshed game page oppo",msg);
   opponent_name = msg;
