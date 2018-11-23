@@ -44,7 +44,7 @@ table, td
        {
              float: left;
              margin:20px;
-             valign: top;
+             vertical-align: top;
              }
              .split {
               height: 100%;
@@ -267,6 +267,56 @@ float:left;}
 #congrats h2{clear:both;padding-top:15px; padding-left:15px;font-family:verdana;
 
 font-size:1.25em;}
+
+#messages {
+  height: 100px;
+  background: #D2C29D;
+  overflow: auto;
+  /* overflow:scroll;
+  overflow-x:hidden; */
+}
+table{
+  border: 2px #2b2b2b solid;
+border-collapse: separate;
+margin-bottom: 20px;
+empty-cells: show;
+opacity: 0.5;
+}
+td,th{
+  border: 2px #2b2b2b solid;
+}
+table.table_of_user{
+  /* border:1; */
+  empty-cells: show;
+}
+.table_of_user td{
+  border-radius: 5px;
+}
+table.table_of_opponent{
+  /* border:1; */
+  empty-cells: show;
+}
+.table_of_opponent{
+  border-radius: 5px;
+}
+#turn{
+  border: 2px solid #dedede;
+  /* background-color: #f1f1f1; */
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+  border-color: #ccc;
+  background-color: #ddd;
+}
+#time{
+  border: 2px solid #dedede;
+  /* background-color: #f1f1f1; */
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+  border-color: #ccc;
+  background-color: #ddd;
+}
 
 @keyframes App-logo-spin {
   from {
