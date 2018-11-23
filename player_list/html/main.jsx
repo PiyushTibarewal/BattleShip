@@ -42,10 +42,10 @@ class Signin extends React.Component {
     return (
       <div >
       <div className='split left row'>
-          <div id="div1" className="col-sm-3">The</div>
-          <div id="div2" className="col-sm-3">Fast</div>
-          <div id="div3" className="col-sm-3">And</div>
-          <div id="div4" className="col-sm-3">Curious</div>
+          <div id="div1" className="col-sm-3"><center><b>THE</b></center></div>
+          <div id="div2" className="col-sm-3"><center><b>FAST</b></center></div>
+          <div id="div3" className="col-sm-3"><center><b>AND</b></center></div>
+          <div id="div4" className="col-sm-3"><center><b>CURIOUS</b></center></div>
         
       </div>
       <div className="split right" id="signin_right">

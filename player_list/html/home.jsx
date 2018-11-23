@@ -12,7 +12,6 @@ var is_playing = 0;
 var time = 5;
 var board = null;
 var mychance = 0;
-// import $ from 'jquery';
 class RuleBook extends React.Component {
  
   componentDidMount() {
@@ -71,12 +70,6 @@ class LeaderBoard extends React.Component {
                 <td>{post.username}</td>
                 <td>{post.games_played}</td>
                 <td>{post.points}</td>
-                {/* <td>
-                  <span onClick={this.updatePost.bind(this, post.username)} className="glyphicon glyphicon-pencil"></span>
-                </td> */}
-                {/* <td>
-                  <span onClick={this.deletePost.bind(this, post.id)} className="glyphicon glyphicon-remove"></span>
-                </td> */}
               </tr>
             }.bind(this))
           }
@@ -130,27 +123,18 @@ class ActivePlayers extends React.Component {
   render() {
 
     return (
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            
-            <th>Username</th>
-            
-            
-          </tr>
-        </thead>
-        <tbody>
+    <div><p align="center"><b>Username</b></p>
         <div  id="accordion">
           {
             this.state.posts.map(function (post, index) {
               if (post.username != sessionStorage.getItem('myusername')) {
-              return <tr key={index} >
-                {/* <td>{index + 1}</td> */}
-            <div className="card">
-      <div className="card-header" id="heading">
-        <h5 className="mb-0">
-          <td><button className="btn btn-link" onClick={this.player_profile.bind(this,post.username)}>{post.username}
-        </button></td>
+              {/* return <tr key={index} > */}
+                {/* <td>{index + 1}</td> className="table table-striped"*/}
+                return <div>     
+      <div  id="heading">
+        <h5 >
+          <button className="btn btn-primary btn-lg btn-block" onClick={this.player_profile.bind(this,post.username)}>{post.username}
+        </button>
         </h5>
       </div>
       <div id={post.username} className="hidden" >
@@ -159,14 +143,12 @@ class ActivePlayers extends React.Component {
            <button  onClick={this.updatePost.bind(this, post.username)} className="mybt glyphicon glyphicon-send">Challenge</button><b><span className="rqst"></span></b>
         </div>
       </div>
-    </div>
-              </tr>   
+      </div>
               }
             }.bind(this))
           }
           </div>
-        </tbody>
-      </table>
+          </div>    
     )
   }
 };

@@ -331,7 +331,7 @@ module.exports = {
 					callback(false);
 				}
 		});
-	}
+	},
 
 	getPlayerBoard: function (player, i, j, callback) {
 		if (i != 8 || j != 8) {

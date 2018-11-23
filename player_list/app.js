@@ -49,7 +49,7 @@ app.post('/signup', function (req, res) {
     user.signup(username, password, function (result) {
       if (result) {
         res.send('success');
-        res.redirect('/signin');
+        // res.redirect('/signin');
       }
       else {
         res.send("Fail");
