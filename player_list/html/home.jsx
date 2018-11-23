@@ -385,17 +385,17 @@ class Board extends React.Component {
 class HomePage extends React.Component {
   render() {
     return (
-      <div class="container" id="root">
-        <div class="header clearfix">
+      <div className="container" id="root">
+        <div className="header clearfix">
           <nav>
-            <ul class="nav nav-pills pull-right">
+            <ul className="nav nav-pills pull-right">
               <li role="presentation" id="homeHyperlink" class="active"><a href="#">Home</a></li>
               <li role="presentation" id="addHyperLink"><a href="/home#/leaderboard">LeaderBoard</a></li>
               <li role="presentation" id="profileHyperlink"><a href="/home#/rules">Rules Book</a></li>
               <li role="presentation" id='logout'><a href="/logout">Logout</a></li>
             </ul>
           </nav>
-          <h3 class="text-muted">Battleship</h3>
+          <h3 className="text-muted">Battleship</h3>
         </div>
         <div id="app" >
           <Router history={hashHistory}>
