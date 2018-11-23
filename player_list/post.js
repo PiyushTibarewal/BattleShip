@@ -84,6 +84,21 @@ module.exports = {
 		});
 
 	},
+	isOnline: function (msg, callback) {
+
+		db1.connection.query("select online from game_user where username=?", [msg], (err, rows) => {
+			var result = JSON.stringify(rows);
+			var red = JSON.parse(result);
+			var online = red[0]['online'];
+			if (online == "Y") {
+				callback(true);
+			}
+			else {
+				callback(false);
+			}
+		});
+
+	},
 
 	setId: function (id, username,callback) {
 		console.log("starting to set id of ", username, " to ", id, "in sql request");
@@ -305,6 +320,18 @@ module.exports = {
 			}
 		}
 	},
+	get_player_profile : function(username,callback){
+		db1.connection.query("select games_played,points from game_user where username=?",[username],(err,rows) => {
+				if(err==null){
+					var result = JSON.stringify(rows);
+					var red = JSON.parse(result);
+					callback(red[0]);
+				}
+				else{
+					callback(false);
+				}
+		});
+	}
 
 	getPlayerBoard: function (player, i, j, callback) {
 		if (i != 8 || j != 8) {

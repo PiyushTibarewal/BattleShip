@@ -13,83 +13,20 @@ var time = 5;
 var board = null;
 var mychance = 0;
 // import $ from 'jquery';
-class ShowProfile extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleNameChange = this.handleNameChange.bind(this);
-    this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.updateProfile = this.updateProfile.bind(this);
-    this.getProfile = this.getProfile.bind(this);
-    this.state = {
-      name: '',
-      email: '',
-      password: '',
-      id: ''
-    };
-
-  }
+class RuleBook extends React.Component {
+ 
   componentDidMount() {
     document.getElementById('addHyperLink').className = "";
     document.getElementById('homeHyperlink').className = "";
     document.getElementById('profileHyperlink').className = "active";
-    this.getProfile();
   }
-  updateProfile() {
-
-    var self = this;
-    axios.post('/updateProfile', {
-      name: this.state.name,
-      password: this.state.password
-    })
-      .then(function (response) {
-        if (response) {
-          hashHistory.push('/')
-        }
-      })
-      .catch(function (error) {
-        console.log('error is ', error);
-      });
-  }
-
-  handleNameChange(e) {
-    this.setState({ name: e.target.value })
-  }
-  handlePasswordChange(e) {
-    this.setState({ password: e.target.value })
-  }
-
-  getProfile() {
-    var self = this;
-    axios.post('/getProfile', {
-    })
-      .then(function (response) {
-        if (response) {
-          self.setState({ name: response.data.name });
-          self.setState({ email: response.data.email });
-          self.setState({ password: response.data.password });
-        }
-      })
-      .catch(function (error) {
-        console.log('error is ', error);
-      });
-  }
-
+ 
   render() {
     return (
-      <div className="col-md-5">
-        <div className="form-area">
-          <form role="form">
-            <br styles="clear:both" />
-            <div className="form-group">
-              <input value={this.state.name} type="text" onChange={this.handleNameChange} className="form-control" placeholder="Name" required />
-            </div>
-            <div className="form-group">
-              <input value={this.state.password} type="password" onChange={this.handlePasswordChange} className="form-control" placeholder="Password" required />
-            </div>
-            <button type="button" onClick={this.updateProfile} id="submit" name="submit" className="btn btn-primary pull-right">Update</button>
-          </form>
-        </div>
-      </div>
+     <div>
+       <h3>Rules</h3>
+       <p>Battleship</p>
+     </div>
     )
   }
 }
@@ -154,6 +91,7 @@ class ActivePlayers extends React.Component {
 
     super(props);
     this.updatePost = this.updatePost.bind(this);
+    this.player_profile=this.player_profile.bind(this);
     this.state = {
       posts: [],
     };
@@ -163,6 +101,11 @@ class ActivePlayers extends React.Component {
   updatePost(username) {
     console.log("request sent to", username)
     socket.emit("send-request", username);
+    $("#"+username).find(".mybt").hide();
+    $('#'+username).find(".rqst").html("request send");
+  }
+  player_profile(username){
+    socket.emit("give player info",username);
   }
 
   changePost(msg) {
@@ -175,6 +118,13 @@ class ActivePlayers extends React.Component {
     document.getElementById('homeHyperlink').className = "active";
     document.getElementById('addHyperLink').className = "";
     document.getElementById('profileHyperlink').className = "";
+    socket.on("display player info",function(msg){
+      console.log(msg);
+      $("#"+msg['username']).find(".g_p").html(msg['games_played']);
+      $("#"+msg['username']).find(".po").html(msg['points']);
+      $("#"+msg['username']).toggleClass('hidden');
+    });
+    
   }
 
   render() {
@@ -183,30 +133,38 @@ class ActivePlayers extends React.Component {
       <table className="table table-striped">
         <thead>
           <tr>
-            <th>#</th>
+            
             <th>Username</th>
-            <th></th>
-            {/* <th></th>
-            <th></th> */}
+            
+            
           </tr>
         </thead>
         <tbody>
+        <div  id="accordion">
           {
             this.state.posts.map(function (post, index) {
               if (post.username != sessionStorage.getItem('myusername')) {
               return <tr key={index} >
-                <td>{index + 1}</td>
-                <td>{post.username}</td>
-                <td>
-                  <span onClick={this.updatePost.bind(this, post.username)} className="glyphicon glyphicon-pencil"></span>
-                </td>
-                {/* <td>
-                  <span onClick={this.deletePost.bind(this, post.id)} className="glyphicon glyphicon-remove"></span>
-                </td> */}
-                </tr>
+                {/* <td>{index + 1}</td> */}
+            <div className="card">
+      <div className="card-header" id="heading">
+        <h5 className="mb-0">
+          <td><button className="btn btn-link" onClick={this.player_profile.bind(this,post.username)}>{post.username}
+        </button></td>
+        </h5>
+      </div>
+      <div id={post.username} className="hidden" >
+        <div className="card-body">
+           <span >games_played : </span><span className="g_p" ></span><span>  points : </span><span className="po" ></span>
+           <button  onClick={this.updatePost.bind(this, post.username)} className="mybt glyphicon glyphicon-send">Challenge</button><b><span className="rqst"></span></b>
+        </div>
+      </div>
+    </div>
+              </tr>   
               }
             }.bind(this))
           }
+          </div>
         </tbody>
       </table>
     )
@@ -321,7 +279,9 @@ class Board extends React.Component {
     $("#start_game").click(function () {
       socket.emit('can game be started', { user: user_name, opponent: opponent_name });
     });
-
+    $("#leave_game").click(function () {
+      socket.emit('left game', { user: user_name, opponent: opponent_name });
+    });
 
     socket.on("game_play", function (msg) {
       $("#start_game").hide();
@@ -416,6 +376,7 @@ class Board extends React.Component {
           <option value="vertical">vertical</option>
         </select>
         <button id="start_game">Start Game</button>
+        <button id="leave_game">Leave Game</button>
         <Chat />
       </div>
     );
@@ -429,8 +390,8 @@ class HomePage extends React.Component {
           <nav>
             <ul class="nav nav-pills pull-right">
               <li role="presentation" id="homeHyperlink" class="active"><a href="#">Home</a></li>
-              <li role="presentation" id="addHyperLink"><a href="/home#/addPost">LeaderBoard</a></li>
-              <li role="presentation" id="profileHyperlink"><a href="/home#/showProfile">Profile</a></li>
+              <li role="presentation" id="addHyperLink"><a href="/home#/leaderboard">LeaderBoard</a></li>
+              <li role="presentation" id="profileHyperlink"><a href="/home#/rules">Rules Book</a></li>
               <li role="presentation" id='logout'><a href="/logout">Logout</a></li>
             </ul>
           </nav>
@@ -439,8 +400,8 @@ class HomePage extends React.Component {
         <div id="app" >
           <Router history={hashHistory}>
             <Route component={ActivePlayers} path="/"></Route>
-            <Route component={LeaderBoard} path="/addPost(/:id)"></Route>
-            <Route component={ShowProfile} path="/showProfile"></Route>
+            <Route component={LeaderBoard} path="/leaderboard"></Route>
+            <Route component={RuleBook} path="/rules"></Route>
           </Router>
         </div>
       </div>
@@ -566,6 +527,7 @@ if (window.performance) {
 };
 socket.emit('home-initialized');
 socket.on('render-home', function () {
+  time = 5;
   ReactDOM.render(<HomePage />,
     document.getElementById('main'));
 });

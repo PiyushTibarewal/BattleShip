@@ -114,6 +114,14 @@ nsp.on('connection', function (socket) {
     refreshed = true;
   });
 
+  socket.on("give player info",function(msg){
+    console.log(msg);
+    post.get_player_profile(msg,function(result){
+      console.log(result);
+        socket.emit("display player info",{username: msg,games_played: result['games_played'],points: result['points']});
+    });
+  });
+
   socket.on('started-home', function (msg) {
     console.log("made connection with username ", msg);
 
@@ -218,6 +226,18 @@ nsp.on('connection', function (socket) {
     });
   });
 
+  socket.on('left game', function (msg) {
+    post.getId(msg['opponent'], function (result) {
+      nsp.to(socket.id).emit('message to display', "Play next match.");
+      nsp.to(result).emit('message to display', "Opponenet Left. Congratulation, you won.");
+      post.changePoints(msg['user'], 5);
+      post.changePoints(msg['opponent'], -5);
+      nsp.to(socket.id).emit("render-home");
+      nsp.to(result).emit("render-home");
+      console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
+    });
+  });
+
   socket.on('chance_played', function (msg) {
     console.log("Received Chance Played req", msg);
     post.getadd_info(msg['user'], 2, "checking turn", 1, function (reso) {
@@ -290,6 +310,22 @@ nsp.on('connection', function (socket) {
         nsp.emit('online-users', result);
       });
     });
+    setTimeout(function() {post.getUsername(socket.id, function (result) {
+      post.isOnline(result, function (result1) {
+        if (!result1) {
+          post.setIs_playing("N", result, function () { });
+          post.getOpponent(result, function (opponent) {
+            post.getId(opponent, function (result2) {
+              nsp.to(result2).emit('message to display', "Opponenet Left. Congratulation, you won.");
+              post.changePoints(result, -5);
+              post.changePoints(opponent, 5);
+              nsp.to(result2).emit("render-home");
+              console.log("Match Over ", result, " won ", opponent, "lost");
+            });
+          });
+        }
+      });
+    })}, 2500);
   });
 
   socket.emit('update-total-time', function (msg) {
