@@ -40,21 +40,34 @@ class Signin extends React.Component {
   }
   render() {
     return (
-      <div>
-        <form className="form-signin">
-          <h2 className="form-signin-heading">Please sign in</h2>
-          <label for="inputUsername" className="sr-only">Username</label>
+      <div >
+      <div className='split left row'>
+          <div id="div1" className="col-sm-3">The</div>
+          <div id="div2" className="col-sm-3">Fast</div>
+          <div id="div3" className="col-sm-3">And</div>
+          <div id="div4" className="col-sm-3">Curious</div>
+        
+      </div>
+      <div className="split right" id="signin_right">
+        <div className="centered" id="signin_back">
+          <div className="row">
+            <div className="col-sm-1"></div>
+              <div className="col-sm-5" id="in_signin"><Link to="/"> {'Signin'}</Link></div>
+              <div className="col-sm-5" id="in_signup"><Link to="/signup">{'SignUp'}</Link></div>
+              </div>  
+        <form className="form-signin" onsubmit={this.signIn}>
+          
+          <br></br><label for="inputUsername" className="sr-only">Username</label>
           <input type="name" onChange={this.handleNameChange} id="inputUsername" className="form-control" placeholder="Name" required autofocus />
+          <br></br>
           <label for="inputPassword" className="sr-only">Password</label>
           <input type="password" onChange={this.handlePasswordChange} id="inputPassword" className="form-control" placeholder="Password" required />
-
-          <button className="btn btn-lg btn-primary btn-block" onClick={this.signIn} type="button">Sign in</button>
+          <br></br>
+          <button className="btn btn-lg btn-primary btn-block rounded" onClick={this.signIn} type="button">Sign in</button>
         </form>
-        <div>
-          <Link to="/signup">{'Signup'}</Link>
-        </div>
       </div>
-
+      </div>
+      </div>
     )
   }
 }
@@ -101,18 +114,32 @@ class Signup extends React.Component {
   render() {
     return (
       <div>
-        <form className="form-signin">
-          <h2 className="form-signin-heading">Please sign up</h2>
-          <label for="inputName" className="sr-only">Username</label>
+      <div className='split left row'>
+          <div id="div1" className="col-sm-3">The</div>
+          <div id="div2" className="col-sm-3">Fast</div>
+          <div id="div3" className="col-sm-3">And</div>
+          <div id="div4" className="col-sm-3">Curious</div>
+        
+      </div>
+      <div className="split right" id="signup_right">
+        <div className="centered" id="signup_back" >
+          <div className="row">
+            <div className="col-sm-1"></div>
+              <div className="col-sm-5" id="up_signin"><Link to="/"> {'Signin'}</Link></div>
+              <div className="col-sm-5" id="up_signup"><Link to="/signup">{'SignUp'}</Link></div>
+              </div>
+        <form className="form-signin" onsubmit={this.signUp}>
+          
+        <br></br><label for="inputName" className="sr-only">Username</label>
           <input type="name" onChange={this.handleNameChange} id="inputfirstName" className="form-control" placeholder="Name" required autofocus />
-          <label for="inputPassword" className="sr-only">Password</label>
+          <br></br>
+          <label for="inputPassword" className="sr-only">Password</label>          
           <input type="password" onChange={this.handlePasswordChange} id="inputPassword" className="form-control" placeholder="Password" required />
-
-          <button className="btn btn-lg btn-primary btn-block" onClick={this.signUp} type="button">Sign up</button>
+            <br></br>
+          <button className="btn btn-lg btn-primary btn-block rounded" onClick={this.signUp} type="button">Sign up</button>
         </form>
-        <div>
-          <Link to="/">{'Signin'}</Link>
-        </div>
+      </div>
+      </div>
       </div>
 
     )

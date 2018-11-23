@@ -108,6 +108,14 @@ nsp.on('connection', function (socket) {
     refreshed = true;
   });
 
+  socket.on("give player info",function(msg){
+    console.log(msg);
+    post.get_player_profile(msg,function(result){
+      console.log(result);
+        socket.emit("display player info",{username: msg,games_played: result['games_played'],points: result['points']});
+    });
+  });
+
   socket.on('started-home', function (msg) {
     console.log("started home with this message- ", msg, " -recieved");
     if (refreshed) {

@@ -9,7 +9,6 @@ var show = null;
 var leader = null;
 var opponent_name = null;
 var is_playing = 0;
-// import $ from 'jquery';
 class ShowProfile extends React.Component {
   constructor(props) {
     super(props);
@@ -151,6 +150,7 @@ class ActivePlayers extends React.Component {
 
     super(props);
     this.updatePost = this.updatePost.bind(this);
+    this.player_profile=this.player_profile.bind(this);
     this.state = {
       posts: [],
     };
@@ -160,6 +160,11 @@ class ActivePlayers extends React.Component {
   updatePost(username) {
     console.log("request sent to", username)
     socket.emit("send-request", username);
+    $("#"+username).find(".mybt").hide();
+    $('#'+username).find(".rqst").html("request send");
+  }
+  player_profile(username){
+    socket.emit("give player info",username);
   }
 
   changePost(msg) {
@@ -172,6 +177,13 @@ class ActivePlayers extends React.Component {
     document.getElementById('homeHyperlink').className = "active";
     document.getElementById('addHyperLink').className = "";
     document.getElementById('profileHyperlink').className = "";
+    socket.on("display player info",function(msg){
+      console.log(msg);
+      $("#"+msg['username']).find(".g_p").html(msg['games_played']);
+      $("#"+msg['username']).find(".po").html(msg['points']);
+      $("#"+msg['username']).toggleClass('hidden');
+    });
+    
   }
 
   render() {
@@ -180,29 +192,37 @@ class ActivePlayers extends React.Component {
       <table className="table table-striped">
         <thead>
           <tr>
-            <th>#</th>
+            
             <th>Username</th>
-            {/* <th></th>
-            <th></th> */}
+            {/* style="border:16px solid white" className="w3-panel w3-blue w3-round-xlarge w3-hover-border-black" */}
           </tr>
         </thead>
         <tbody>
+        <div  id="accordion">
           {
             this.state.posts.map(function (post, index) {
               if(post.username != user_name){
               return <tr key={index} >
-                <td>{index + 1}</td>
-                <td>{post.username}</td>
-                <td>
-                  <span onClick={this.updatePost.bind(this, post.username)} className="glyphicon glyphicon-pencil"></span>
-                </td>
-                {/* <td>
-                  <span onClick={this.deletePost.bind(this, post.id)} className="glyphicon glyphicon-remove"></span>
-                </td> */}
-              </tr>
+                {/* <td>{index + 1}</td> */}
+            <div className="card">
+      <div className="card-header" id="heading">
+        <h5 className="mb-0">
+          <td><button className="btn btn-link" onClick={this.player_profile.bind(this,post.username)}>{post.username}
+        </button></td>
+        </h5>
+      </div>
+      <div id={post.username} className="hidden" >
+        <div className="card-body">
+           <span >games_played : </span><span className="g_p" ></span><span>  points : </span><span className="po" ></span>
+           <button  onClick={this.updatePost.bind(this, post.username)} className="mybt glyphicon glyphicon-send">Challenge</button><b><span className="rqst"></span></b>
+        </div>
+      </div>
+    </div>
+              </tr>   
               }
             }.bind(this))
           }
+          </div>
         </tbody>
       </table>
     )
@@ -356,17 +376,17 @@ class Board extends React.Component {
 }
 class HomePage extends React.Component {
   render() {return(
-    <div class="container" id="root">
-      <div class="header clearfix">
+    <div className="container" id="root">
+      <div className="header clearfix">
         <nav>
-          <ul class="nav nav-pills pull-right">
+          <ul className="nav nav-pills pull-right">
             <li role="presentation" id="homeHyperlink" class="active"><a href="#">Home</a></li>
             <li role="presentation" id="addHyperLink"><a href="/home#/addPost">LeaderBoard</a></li>
             <li role="presentation" id="profileHyperlink"><a href="/home#/showProfile">Profile</a></li>
             <li role="presentation" id='logout'><a href="/logout">Logout</a></li>
           </ul>
         </nav>
-        <h3 class="text-muted">Battleship</h3>
+        <h3 className="text-muted">Battleship</h3>
       </div>
       <div id="app" >
         <Router history={hashHistory}>

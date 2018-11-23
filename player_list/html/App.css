@@ -46,8 +46,160 @@ table, td
              margin:20px;
              valign: top;
              }
+             .split {
+              height: 100%;
+              width: 50%;
+              position: fixed;
+              z-index: 1;
+              top: 0;
+              overflow-x: hidden;
+              padding-top: 20px;
+          }
+          .centered {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .right {
+          right: 0;
+          /* background-color: red; */
+      }
+          
+      #div1 {
+        width: 100px;
+        height: 50px;
+        background-color: red;
+        font-weight: bold;
+        position: relative;
+        -webkit-animation: mymove 0.5s ; /* Safari 4.0 - 8.0 */
+        animation: mymove 0.5s ;
+        -webkit-animation-iteration-count: 1;
+      animation-iteration-count: 1;
+      -webkit-animation-timing-function: linear;
+      animation-timing-function: linear;
+      -webkit-animation-fill-mode: forwards;
+      animation-fill-mode: forwards;
+    }
+    #div2 {
+      width: 100px;
+      height: 50px;
+      background-color: red;
+      font-weight: bold;
+      position: relative;
+      -webkit-animation: mymove 0.5s ; /* Safari 4.0 - 8.0 */
+      animation: mymove 0.5s ;
+      -webkit-animation-iteration-count: 1;
+      animation-iteration-count: 1;
+      -webkit-animation-timing-function: ease;
+      animation-timing-function: ease;
+      -webkit-animation-fill-mode: forwards;
+      animation-fill-mode: forwards;
+  }
+  #div3 {
+    width: 100px;
+    height: 50px;
+    background-color: red;
+    font-weight: bold;
+    position: relative;
+    -webkit-animation: mymove 0.5s ; /* Safari 4.0 - 8.0 */
+    -webkit-animation-iteration-count: 1;
+    animation: mymove 0.5s ;
+    animation-iteration-count: 1;
+    -webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-fill-mode: forwards;
+      animation-fill-mode: forwards;
+}
+#div4 {
+  width: 100px;
+  height: 50px;
+  background-color: red;
+  font-weight: bold;
+  position: relative;
+  -webkit-animation: mymove 0.5s ; /* Safari 4.0 - 8.0 */
+  -webkit-animation-iteration-count: 1;
+  animation: mymove 0.5s ;
+  animation-iteration-count: 1;
+  -webkit-animation-timing-function: ease-out;
+  animation-timing-function: ease-out;
+  -webkit-animation-fill-mode: forwards;
+      animation-fill-mode: forwards;
+} 
+    
+    /* Safari 4.0 - 8.0 */
+    @-webkit-keyframes mymove {
+        from {top: 0px;}
+        to {top: 100px;}
+    }
+    
+    /* Standard syntax */
+    @keyframes mymove {
+        from {top: 0px;}
+        to {top: 100px;}
+    }
+    .form-control {
+      padding-right: 30px;
+  }
+  
+   .glyphicon + .form-control {
+      position: absolute;
+      left: 0;
+      padding: 8px 27px;
+  }    
+  #bg {
+    position: fixed; 
+    top: -50%; 
+    left: -50%; 
+    width: 200%; 
+    height: 200%;
+  }
+  #bg img {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0; 
+    margin: auto; 
+    min-width: 50%;
+    min-height: 50%;
+  }
+  #in_signin{
+    background-color: yellow;
+    text-decoration-color: black;
+  }
+  #in_signup{
+    background-color: white;
+    text-decoration-color: black;
+  }
+  #up_signin{
+    background-color:white;
+    text-decoration-color: black;
+  }
+  #up_signup{
+    background-color: yellow;
+    text-decoration-color: black;
+  }
 
+  .rounded{
+    border-radius: 50px;
+  }
+  #signin_back{
+    background-color: grey;
+    opacity:0.85;
+  }
+  #signup_back{
+    background-color: grey;
+    opacity:0.85;
+  }
 
+  .g_p{
+    padding-right: 30px;
+  }
+  .po{
+    padding-right: 30px;
+  }
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

@@ -308,6 +308,18 @@ module.exports = {
 			}
 		}
 	},
+	get_player_profile : function(username,callback){
+		db1.connection.query("select games_played,points from game_user where username=?",[username],(err,rows) => {
+				if(err==null){
+					var result = JSON.stringify(rows);
+					var red = JSON.parse(result);
+					callback(red[0]);
+				}
+				else{
+					callback(false);
+				}
+		});
+	}
 
 	// checkBlocks : function (user,i,j,Blocks,callback) {
 	// 	var ans = 1;
