@@ -12,21 +12,21 @@ var is_playing = 0;
 var time = 5;
 var board = null;
 var mychance = 0;
-var p=true;
+var p = true;
 class RuleBook extends React.Component {
- 
+
   componentDidMount() {
     document.getElementById('addHyperLink').className = "";
     document.getElementById('homeHyperlink').className = "";
     document.getElementById('profileHyperlink').className = "active";
   }
- 
+
   render() {
     return (
-     <div>
-       <h3>Rules</h3>
-       <p>Battleship</p>
-     </div>
+      <div>
+        <h3>Rules</h3>
+        <p>Battleship</p>
+      </div>
     )
   }
 }
@@ -85,7 +85,7 @@ class ActivePlayers extends React.Component {
 
     super(props);
     this.updatePost = this.updatePost.bind(this);
-    this.player_profile=this.player_profile.bind(this);
+    this.player_profile = this.player_profile.bind(this);
     this.state = {
       posts: [],
     };
@@ -95,72 +95,73 @@ class ActivePlayers extends React.Component {
   updatePost(username) {
     console.log("request sent to", username)
     socket.emit("send-request", username);
-    $("#"+username).find(".mybt").hide();
-    $('#'+username).find(".rqst").html("request send");
+    $("#" + username).find(".mybt").hide();
+    $('#' + username).find(".rqst").html("request send");
   }
-  player_profile(username){
-    console.log("give player info",username);
-    socket.emit("give player info",username);
+  player_profile(username) {
+    console.log("give player info", username);
+    socket.emit("give player info", username);
   }
 
   changePost(msg) {
     this.setState({ posts: msg });
   }
-  
-  
+
+
   componentDidMount() {
 
     socket.emit("started-home", sessionStorage.getItem('myusername'));
     document.getElementById('homeHyperlink').className = "active";
     document.getElementById('addHyperLink').className = "";
     document.getElementById('profileHyperlink').className = "";
-    socket.on("display player info",function(msg){
+    socket.on("display player info", function (msg) {
       console.log(msg);
       console.log("YO");
-      $("#"+msg['username']).find(".g_p").html(msg['games_played']);
-      $("#"+msg['username']).find(".po").html(msg['points']);
-      if(p){ p=false;//Socket called twice here.
-      $("#"+msg['username']).toggleClass('hidden');
-    }
-    setTimeout(function(){p=true},500);
-  });
+      $("#" + msg['username']).find(".g_p").html(msg['games_played']);
+      $("#" + msg['username']).find(".po").html(msg['points']);
+      if (p) {
+        p = false;//Socket called twice here.
+        $("#" + msg['username']).toggleClass('hidden');
+      }
+      setTimeout(function () { p = true }, 500);
+    });
     socket.on('request declined sendby', function (msg) {
-      console.log("declined request",msg);
-    
+      console.log("declined request", msg);
 
-      $('#'+msg).find(".rqst").html("Sorry! "+msg+" declined your request.");
+
+      $('#' + msg).find(".rqst").html("Sorry! " + msg + " declined your request.");
     });
   }
 
   render() {
 
     return (
-    <div><p align="center"><b>Username</b></p>
-        <div  id="accordion">
+      <div><center><p><b>Active Players</b></p></center>
+        <div id="accordion">
           {
             this.state.posts.map(function (post, index) {
               if (post.username != sessionStorage.getItem('myusername')) {
-              {/* return <tr key={index} > */}
-                {/* <td>{index + 1}</td> className="table table-striped"*/}
-                return <div>     
-      <div  id="heading">
-        <h5 >
-          <button className="btn btn-primary btn-lg btn-block" onClick={this.player_profile.bind(this,post.username)}>{post.username}
-        </button>
-        </h5>
-      </div>
-      <div id={post.username} className="hidden" >
-        <div className="card-body">
-           <span >games_played : </span><span className="g_p" ></span><span>  points : </span><span className="po" ></span>
-           <button  onClick={this.updatePost.bind(this, post.username)} className="mybt glyphicon glyphicon-send">Challenge</button><b><span className="rqst"></span></b>
-        </div>
-      </div>
-      </div>
+                {/* return <tr key={index} > */ }
+                {/* <td>{index + 1}</td> className="table table-striped"*/ }
+                return <div>
+                  <div id="heading">
+                    <h5 >
+                      <button className="btn btn-primary btn-lg btn-block" onClick={this.player_profile.bind(this, post.username)}>{post.username}
+                      </button>
+                    </h5>
+                  </div>
+                  <div id={post.username} className="hidden" >
+                    <div className="card-body">
+                      <span >games_played : </span><span className="g_p" ></span><span>  points : </span><span className="po" ></span>
+                      <button onClick={this.updatePost.bind(this, post.username)} className="mybt glyphicon glyphicon-send">Challenge</button><b><span className="rqst"></span></b>
+                    </div>
+                  </div>
+                </div>
               }
             }.bind(this))
           }
-          </div>
-          </div>    
+        </div>
+      </div>
     )
   }
 };
@@ -253,22 +254,22 @@ class Board extends React.Component {
         }
       }
       //emit when hovering over i,j 
-   },function () {
-    var name = $(this).closest('table').attr('id');
+    }, function () {
+      var name = $(this).closest('table').attr('id');
 
-    var c = $(this).parent().children().index($(this));
-    var r = $(this).parent().parent().children().index($(this).parent());
-    if (is_playing == 0) {
-      var a = $('#shape').val();
-      console.log(a);
-      var b = $('#h_or_v').val();
-      console.log(b);
-      if (name == 'user') {
-        socket.emit("hover_out", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
+      var c = $(this).parent().children().index($(this));
+      var r = $(this).parent().parent().children().index($(this).parent());
+      if (is_playing == 0) {
+        var a = $('#shape').val();
+        console.log(a);
+        var b = $('#h_or_v').val();
+        console.log(b);
+        if (name == 'user') {
+          socket.emit("hover_out", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
+        }
       }
-    }
-    //emit when hovering out of i,j 
- });
+      //emit when hovering out of i,j 
+    });
 
     $("#start_game").click(function () {
       socket.emit('can game be started', { user: user_name, opponent: opponent_name });
@@ -281,7 +282,7 @@ class Board extends React.Component {
       $("#start_game").hide();
       $('#shape').hide();
       $('#h_or_v').hide();
-      is_playing=1;
+      is_playing = 1;
     });
     socket.on('message to display', function (msg) {
       document.getElementById('turn').innerHTML = msg;
@@ -301,8 +302,8 @@ class Board extends React.Component {
       var r2 = Number(r) - 1;
       var c2 = Number(c) - 1;
       if (msg['color'] != 'brown' && msg['color'] != 'grey' && msg['color'] != 'white' && msg['color'] != 'black') {
-        if(mychance==1)
-          socket.emit('update-total-time',{ total_time : Number(time), user: user_name, opponent: opponent_name });
+        if (mychance == 1)
+          socket.emit('update-total-time', { total_time: Number(time), user: user_name, opponent: opponent_name });
         time = 5;
         document.getElementById('time').innerHTML = time;
       }
@@ -467,54 +468,99 @@ class Chat extends React.Component {
   }
 }
 
-class Congrats extends React.Component{
-  constructor(){
+class Congrats extends React.Component {
+  constructor() {
     super();
 
   }
-  render () {
-    return ( 
-      <div id="congrats"> 
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<h2>Congratulations You Won!</h2>
+  render() {
+    return (
+      <div id="congrats">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <h2>Congratulations You Won!</h2>
 
 
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
 
-</div>
+      </div>
     );
   }
 }
 
+class Fail extends React.Component {
+  constructor() {
+    super();
 
+  }
+  render() {
+    return (
+      <div id="congrats">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <h2>Sorry you lost!</h2>
+
+
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+
+      </div>
+    );
+  }
+}
+socket.on('render-lost', function () {
+  ReactDOM.render(<Fail />, document.getElementById('main'));
+});
+socket.on('render-won', function () {
+  ReactDOM.render(<Congrats />, document.getElementById('main'));
+});
 socket.on("render game as refresh", function (msg) {
-  console.log("refreshed game page oppo",msg);
+  console.log("refreshed game page oppo", msg);
   opponent_name = msg;
-  user_name=sessionStorage.getItem("myusername");
-  ReactDOM.render(<Board />,document.getElementById('main'));
-  socket.emit("refreshed game",{ user: sessionStorage.getItem("myusername"), opponent: opponent_name });
+  user_name = sessionStorage.getItem("myusername");
+  ReactDOM.render(<Board />, document.getElementById('main'));
+  socket.emit("refreshed game", { user: sessionStorage.getItem("myusername"), opponent: opponent_name });
 });
 
 socket.on('online-users', function (msg) {

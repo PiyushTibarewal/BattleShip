@@ -49,7 +49,7 @@ app.post('/signup', function (req, res) {
     user.signup(username, password, function (result) {
       if (result) {
         res.send('success');
-        // res.redirect('/signin');
+        // res.redirect('/#/');
       }
       else {
         res.send("Fail");
@@ -220,8 +220,11 @@ nsp.on('connection', function (socket) {
       nsp.to(result).emit('message to display', "Opponenet Timed Out. COngratulation, you won.");
       post.changePoints(msg['user'], 10);
       post.changePoints(msg['opponent'], -5);
+      nsp.to(socket.id).emit("render-lost");
+      nsp.to(result).emit("render-won");
+      setTimeout(function(){
       nsp.to(socket.id).emit("render-home");
-      nsp.to(result).emit("render-home");
+      nsp.to(result).emit("render-home");},4000);
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
     });
   });
@@ -232,8 +235,10 @@ nsp.on('connection', function (socket) {
       nsp.to(result).emit('message to display', "Opponenet Left. Congratulation, you won.");
       post.changePoints(msg['user'], 5);
       post.changePoints(msg['opponent'], -5);
+      nsp.to(result).emit("render-won");   
       nsp.to(socket.id).emit("render-home");
-      nsp.to(result).emit("render-home");
+      setTimeout(function(){
+      nsp.to(result).emit("render-home");},4000);
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
     });
   });
@@ -274,8 +279,11 @@ nsp.on('connection', function (socket) {
                       post.changePoints(msg['opponent'], -5);
                       post.dropTable(msg['user'], function () { });
                       post.dropTable(msg['opponent'], function () { });
+                      nsp.to(socket.id).emit("render-won");
+                      nsp.to(result).emit("render-lost");
+                      setTimeout(function(){
                       nsp.to(socket.id).emit("render-home");
-                      nsp.to(result).emit("render-home");
+                      nsp.to(result).emit("render-home");},4000);
                       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
                     }
                     else {
@@ -321,7 +329,9 @@ nsp.on('connection', function (socket) {
                     nsp.to(result2).emit('message to display', "Opponenet Left. Congratulation, you won.");
                     post.changePoints(result, -5);
                     post.changePoints(opponent, 5);
-                    nsp.to(result2).emit("render-home");
+      nsp.to(result2).emit("render-won");
+      setTimeout(function(){
+      nsp.to(result2).emit("render-home");},4000);
                     console.log("Match Over ", result, " won ", opponent, "lost");
                   });
                 });
