@@ -59,24 +59,29 @@ module.exports = {
 	},
 	validateSignIn: function (username, password, callback) {
 
-		db1.connection.query("SELECT count(username) as count FROM game_user WHERE username = ? AND password = ?", [username, password], (err, result, fields) => {
+		db1.connection.query("SELECT username,online FROM game_user WHERE username = ? AND password = ?", [username, password], (err, result, fields) => {
 			var str1 = JSON.stringify(result);
+			console.log(result,str1,username,password);
 			var json = JSON.parse(str1);
-			if (json[0]['count'] != 0 && err == null) {
+			var on = json[0]['online'];
+			if (json.length == 1 &&  on == 'N' && err == null) {
 				db1.connection.query("update game_user set online=? where username=?", ["Y", username], (e, r) => {
 					if (e == null) {
 						console.log('returning true for validatesignin')
-						callback(true)
+						callback(1)
 					}
 					else {
 						console.error(err);
-						callback(false);
+						callback(0);
 					}
 				});
 			}
+			else if (json.length == 1 && on=='Y' && err==null) {
+				callback(2);
+			}
 			else {
-				console.log('returning false for validatesignin')
-				callback(false)
+				console.log('returning false for validatesignin');
+				callback(0);
 			}
 
 		});

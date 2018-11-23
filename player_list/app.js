@@ -66,10 +66,13 @@ app.post('/signin', function (req, res) {
   var username = req.body.username;
   var password = req.body.password;
   user.validateSignIn(username, password, function (result) {
-    if (result) {
+    if (result==1) {
       sessions.username = username;
       res.send(username);
       post.setIs_playing("N", username, function () { });
+    }
+    else if (result==2) {
+      res.send("online");
     }
     else {
       res.send("Failure");
@@ -202,6 +205,7 @@ nsp.on('connection', function (socket) {
     res.redirect('/#/');
   }
   );
+
   socket.on('time_out', function (msg) {
     post.getId(msg['opponent'], function (result) {
       nsp.to(socket.id).emit('message to display', "Timed out. You lost.");
@@ -213,6 +217,7 @@ nsp.on('connection', function (socket) {
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
     });
   });
+
   socket.on('chance_played', function (msg) {
     console.log("Received Chance Played req", msg);
     post.getadd_info(msg['user'], 2, "checking turn", 1, function (reso) {
@@ -286,6 +291,7 @@ nsp.on('connection', function (socket) {
       });
     });
   });
+
   socket.emit('update-total-time', function (msg) {
     post.getadd_info(msg['user'], 1, "Update time", 2, function (result) {
       post.setadd_info(msg['user'], 1, result + 5 - msg['total_time'], 2);
