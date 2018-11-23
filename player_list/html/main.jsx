@@ -22,6 +22,9 @@ class Signin extends React.Component {
         if(response.data=="Failure"){
           alert("Provided login credentials are wrong.Please login again.");
         }
+        else if (response.data=="online"){
+          alert("This username is already locked in. Use another username or signup with new username");
+        }
         else if (response.data) {
           sessionStorage.setItem('myusername', response.data);
           var ip = 'http://'+window.location.hostname+':7777/home';

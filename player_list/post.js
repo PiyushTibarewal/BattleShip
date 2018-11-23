@@ -84,6 +84,21 @@ module.exports = {
 		});
 
 	},
+	onlyIsPlaying: function (msg, callback) {
+
+		db1.connection.query("select is_playing from game_user where username=?", [msg], (err, rows) => {
+			var result = JSON.stringify(rows);
+			var red = JSON.parse(result);
+			var check = red[0]['is_playing'];
+			if (check == "Y" ) {
+				callback(true);
+			}
+			else {
+				callback(false);
+			}
+		});
+
+	},
 	isOnline: function (msg, callback) {
 
 		db1.connection.query("select online from game_user where username=?", [msg], (err, rows) => {
