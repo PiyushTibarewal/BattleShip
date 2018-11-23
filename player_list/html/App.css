@@ -155,7 +155,21 @@ table, td
       position: absolute;
       left: 0;
       padding: 8px 27px;
-  }    
+  }
+  .btn {
+    cursor: url("cursors/home.cur"),default;
+  }
+
+  table.tuser {
+    cursor: url("cursors/grab.png"),default;
+    z-index: 1;
+  }
+
+  table.toppo {
+    cursor: url("cursors/target.png"),default;
+    z-index: 1;
+  }
+
   #bg {
     position: fixed; 
     top: -50%; 

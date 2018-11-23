@@ -13,9 +13,32 @@ var time = 5;
 var board = null;
 var mychance = 0;
 var p = true;
+
+
+var click_url = "http://192.168.0.105:7777/Sounds/mouse_click.mp3";
+var click = new Audio(click_url);
+var ding_url = "http://192.168.0.105:7777/Sounds/ding.mp3";
+var ding = new Audio(ding_url);
+var exp_url = "http://192.168.0.105:7777/Sounds/explosion.mp3";
+var exp = new Audio(exp_url);
+var mfail_url = "http://192.168.0.105:7777/Sounds/mission_failed.mp3";
+var mfail = new Audio(mfail_url);
+var slip_url = "http://192.168.0.105:7777/Sounds/slip.mp3";
+var slip = new Audio(slip_url);
+
+
+// var homecur = 'style="cursor: url(http://' + window.location.hostname + ':7777/cursors/home.cur),default;"';
 class RuleBook extends React.Component {
+  constructor(props) {
+    super(props);
+    this.url = "http://192.168.0.105:7777/Sounds/mouse_click.mp3";
+    this.audio = new Audio(click);
+  }
 
   componentDidMount() {
+    slip.pause();
+    // this.audio.play();
+    click.play();
     document.getElementById('addHyperLink').className = "";
     document.getElementById('homeHyperlink').className = "";
     document.getElementById('profileHyperlink').className = "active";
@@ -38,12 +61,6 @@ class LeaderBoard extends React.Component {
       posts: [],
     };
     leader = this;
-    this.url = 'http://' + window.location.hostname + ':7777/hidden_masters.mp3';
-    this.audio = new Audio(this.url);
-
-    this.url1 = "http://192.168.0.105:7777/Sounds/mouse_click.mp3";
-    this.audio1 = new Audio(this.url1);
-
   }
 
   changeLeader(msg) {
@@ -52,9 +69,6 @@ class LeaderBoard extends React.Component {
 
 
   componentDidMount() {
-    this.audio1.play();
-    // this.audio.play();
-
     socket.emit("started-leaderboard", "challenge accepted");
     document.getElementById('homeHyperlink').className = "";
     document.getElementById('addHyperLink').className = "active";
