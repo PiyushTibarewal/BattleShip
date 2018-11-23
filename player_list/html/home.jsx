@@ -12,7 +12,8 @@ var is_playing = 0;
 var time = 5;
 var board = null;
 var mychance = 0;
-var p=true;
+var p = true;
+var chat = null;
 class RuleBook extends React.Component {
  
   componentDidMount() {
@@ -276,7 +277,25 @@ class Board extends React.Component {
     $("#leave_game").click(function () {
       socket.emit('left game', { user: user_name, opponent: opponent_name });
     });
-
+    socket.on('get-chance', function (msg) {
+      console.log('Send to opponent chance');
+      if (mychance==0) {
+        socket.emit('receive-chance',1);
+      }
+     
+    });
+    socket.on('set-time', function (msg) {
+      time=msg;
+     
+    });
+    socket.on('set-mychance', function (msg) {
+      if (msg) {
+        mychance = true;
+      }
+      else {
+        mychance = false;
+      }
+    });
     socket.on("game_play", function (msg) {
       $("#start_game").hide();
       $('#shape').hide();
@@ -326,7 +345,7 @@ class Board extends React.Component {
       console.log(time);
     });
     socket.on("shape_placed",function(msg){
-      $("#shape option[value=" + msg + "]").remove();
+      // $("#shape option[value=" + msg + "]").remove();
     })
   }
 
@@ -409,7 +428,7 @@ class HomePage extends React.Component {
 class Chat extends React.Component {
   constructor(props) {
     super(props);
-
+    chat =this;
     this.state = {
       username: user_name,
       message: '',
@@ -420,6 +439,15 @@ class Chat extends React.Component {
 
     this.socket.on('RECEIVE_MESSAGE', function (data) {
       addMessage(data);
+    });
+    this.socket.on('get-chat', function () {
+      console.log('send to opponent',chat.state.messages)
+      socket.emit('receive-chat', chat.state.messages)
+    });
+    this.socket.on('set-msg', function (msg) {
+      console.log('Received message',msg)
+      chat.setState({ messages:msg });
+      
     });
 
     const addMessage = data => {
@@ -580,7 +608,16 @@ class Congrats extends React.Component{
   }
 }
 
-
+socket.on('render-won', function () {
+  time = 5;
+  ReactDOM.render(<Congrats />,
+    document.getElementById('main'));
+});
+socket.on('render-lost', function () {
+  time = 5;
+  ReactDOM.render(<Congrats />,
+    document.getElementById('main'));
+});
 socket.on("render game as refresh", function (msg) {
   console.log("refreshed game page oppo",msg);
   opponent_name = msg;

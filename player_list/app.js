@@ -66,12 +66,12 @@ app.post('/signin', function (req, res) {
   var username = req.body.username;
   var password = req.body.password;
   user.validateSignIn(username, password, function (result) {
-    if (result==1) {
+    if (result == 1) {
       sessions.username = username;
       res.send(username);
       post.setIs_playing("N", username, function () { });
     }
-    else if (result==2) {
+    else if (result == 2) {
       res.send("online");
     }
     else {
@@ -222,9 +222,10 @@ nsp.on('connection', function (socket) {
       post.changePoints(msg['opponent'], -5);
       nsp.to(socket.id).emit("render-lost");
       nsp.to(result).emit("render-won");
-      setTimeout(function(){
-      nsp.to(socket.id).emit("render-home");
-      nsp.to(result).emit("render-home");},4000);
+      setTimeout(function () {
+        nsp.to(socket.id).emit("render-home");
+        nsp.to(result).emit("render-home");
+      }, 4000);
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
     });
   });
@@ -235,10 +236,11 @@ nsp.on('connection', function (socket) {
       nsp.to(result).emit('message to display', "Opponenet Left. Congratulation, you won.");
       post.changePoints(msg['user'], 5);
       post.changePoints(msg['opponent'], -5);
-      nsp.to(result).emit("render-won");   
+      nsp.to(result).emit("render-won");
       nsp.to(socket.id).emit("render-home");
-      setTimeout(function(){
-      nsp.to(result).emit("render-home");},4000);
+      setTimeout(function () {
+        nsp.to(result).emit("render-home");
+      }, 4000);
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
     });
   });
@@ -281,9 +283,10 @@ nsp.on('connection', function (socket) {
                       post.dropTable(msg['opponent'], function () { });
                       nsp.to(socket.id).emit("render-won");
                       nsp.to(result).emit("render-lost");
-                      setTimeout(function(){
-                      nsp.to(socket.id).emit("render-home");
-                      nsp.to(result).emit("render-home");},4000);
+                      setTimeout(function () {
+                        nsp.to(socket.id).emit("render-home");
+                        nsp.to(result).emit("render-home");
+                      }, 4000);
                       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
                     }
                     else {
@@ -329,9 +332,10 @@ nsp.on('connection', function (socket) {
                     nsp.to(result2).emit('message to display', "Opponenet Left. Congratulation, you won.");
                     post.changePoints(result, -5);
                     post.changePoints(opponent, 5);
-      nsp.to(result2).emit("render-won");
-      setTimeout(function(){
-      nsp.to(result2).emit("render-home");},4000);
+                    nsp.to(result2).emit("render-won");
+                    setTimeout(function () {
+                      nsp.to(result2).emit("render-home");
+                    }, 4000);
                     console.log("Match Over ", result, " won ", opponent, "lost");
                   });
                 });
@@ -369,7 +373,7 @@ nsp.on('connection', function (socket) {
               nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'brown' });
               post.setBlockColour(msg['user'], msg['i'] + entry[0], msg['j'] + entry[1], 1, function () { });
             });
-            nsp.to(socket.id).emit("shape_placed",msg["shape"]);
+            nsp.to(socket.id).emit("shape_placed", msg["shape"]);
             post.setadd_info(msg['user'], pos, 1, 1);
           }
           else {
@@ -452,25 +456,37 @@ nsp.on('connection', function (socket) {
   });
   var ms = null;
   var t = null;
-  var chance=0;
-  socket.on('receive-chat',function(msg){
-    ms=msg;
+  var chance = 0;
+  socket.on('receive-chat', function (msg) {
+    console.log('Received chat', msg);
+    post.getUsername(socket.id, function (player) {         
+      post.getOpponent(player, function (oppon) {
+        post.getId(oppon, function (res) {
+          console.log('Opponenent on refresh', oppon,"ID",res);
+          nsp.to(res).emit('set-msg',msg);
+        });
+      });
+    });
+  });
+  socket.on('receive-time', function (msg) {
+    t = msg;
+    console.log('Received time', msg);
   })
-  socket.on('receive-time',function(msg){
-    t=msg;
-  })
-  socket.on('receive-chance',function(msg){
-    chance=msg;
+  socket.on('receive-chance', function (msg) {
+    chance = msg;
   })
   socket.on('refreshed game', function (msg) {
     var player = msg['user'];
-    var oppo =null;
-    post.getOpponent(player,function(oppon){
-    oppo=oppon;
-    post.getId(oppo, function (res) {
-    nsp.to(res).emit('get-chat');
-    nsp.to(res).emit('get-chance');
-    nsp.to(res).emit('get-time');});});
+    var oppo = null;
+    post.getOpponent(player, function (oppon) {
+      oppo = oppon;
+      post.getId(oppo, function (res) {
+        console.log('Opponenent on refresh', oppo)
+        nsp.to(res).emit('get-chat');
+        nsp.to(res).emit('get-chance');
+        nsp.to(res).emit('get-time');
+      });
+    });
     console.log("request to retrive board ", msg);
     post.getadd_info(player, 1, "game started", 1, function (turn) {
       if (turn == 1) {
@@ -526,10 +542,6 @@ nsp.on('connection', function (socket) {
       }
       else console.log("Major ERROR app.js socket.on refreshed home");
     });
-    socket.emit('set-msg',ms);
-    socket.emit('set-time',t);
-    socket.emit('set-chance',chance);
-
 
   });
 
