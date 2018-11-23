@@ -9,7 +9,7 @@ var show = null;
 var leader = null;
 var opponent_name = null;
 var is_playing = 0;
-var time = 5;
+var time = 50;
 var board = null;
 var mychance = 0;
 var p = true;
@@ -211,6 +211,8 @@ class Board extends React.Component {
     var t = setTimeout(this.changetime, 1000);
   }
   componentDidMount() {
+    document.getElementById('time').innerHTML = time;
+    document.getElementById('turn').innerHTML = "May the odds be in your favour.";
 
     $('td').click(function () {
       var name = $(this).closest('table').attr('id');
@@ -277,29 +279,37 @@ class Board extends React.Component {
     $("#leave_game").click(function () {
       socket.emit('left game', { user: user_name, opponent: opponent_name });
     });
-    socket.on('get-chance', function (msg) {
+    socket.on('get-chance', function () {
       console.log('Send to opponent chance');
       if (mychance==0) {
         socket.emit('receive-chance',1);
       }
-     
     });
+    socket.on('get-time', function () {
+      console.log('Send to opponent chance');
+        socket.emit('receive-time',time); 
+      
+    });
+
     socket.on('set-time', function (msg) {
       time=msg;
-     
+      time=time+2;
+      if(is_playing==1)
+     board.changetime();
     });
-    socket.on('set-mychance', function (msg) {
+    socket.on('set-chance', function (msg) {
       if (msg) {
-        mychance = true;
+        mychance = 1;
       }
       else {
-        mychance = false;
+        mychance = 0;
       }
     });
     socket.on("game_play", function (msg) {
       $("#start_game").hide();
       $('#shape').hide();
       $('#h_or_v').hide();
+      $('#leave_game').hide();
       is_playing=1;
     });
     socket.on('message to display', function (msg) {
@@ -322,7 +332,7 @@ class Board extends React.Component {
       if (msg['color'] != 'brown' && msg['color'] != 'grey' && msg['color'] != 'white' && msg['color'] != 'black') {
         if(mychance==1)
           socket.emit('update-total-time',{ total_time : Number(time), user: user_name, opponent: opponent_name });
-        time = 5;
+        time = 50;
         document.getElementById('time').innerHTML = time;
       }
       var v1 = Number((8 * r2)) + Number(c2); console.log(v1);
@@ -500,7 +510,7 @@ class Chat extends React.Component {
           <div className="col-4">
             <div className="card">
               <div className="card-body">
-                <div className="card-title">Chat</div>
+                <div className="card-title" id="chat-name">Chat</div>
                 <hr />
                 <div className="messages" id="messages">
                   {this.state.messages.map(message => {
@@ -609,12 +619,12 @@ class Congrats extends React.Component{
 }
 
 socket.on('render-won', function () {
-  time = 5;
+  time = 50;
   ReactDOM.render(<Congrats />,
     document.getElementById('main'));
 });
 socket.on('render-lost', function () {
-  time = 5;
+  time = 50;
   ReactDOM.render(<Congrats />,
     document.getElementById('main'));
 });
@@ -669,7 +679,7 @@ if (window.performance) {
 };
 socket.emit('home-initialized');
 socket.on('render-home', function () {
-  time = 5;
+  time = 50;
   ReactDOM.render(<HomePage />,
     document.getElementById('main'));
 });

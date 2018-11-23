@@ -458,23 +458,31 @@ nsp.on('connection', function (socket) {
   var t = null;
   var chance = 0;
   socket.on('receive-chat', function (msg) {
-    console.log('Received chat', msg);
     post.getUsername(socket.id, function (player) {         
       post.getOpponent(player, function (oppon) {
         post.getId(oppon, function (res) {
-          console.log('Opponenent on refresh', oppon,"ID",res);
           nsp.to(res).emit('set-msg',msg);
         });
       });
     });
   });
   socket.on('receive-time', function (msg) {
-    t = msg;
-    console.log('Received time', msg);
+    post.getUsername(socket.id, function (player) {         
+      post.getOpponent(player, function (oppon) {
+        post.getId(oppon, function (res) {
+          nsp.to(res).emit('set-time',msg);
+        });
+      });
+    });
   })
   socket.on('receive-chance', function (msg) {
-    chance = msg;
-  })
+    post.getUsername(socket.id, function (player) {         
+      post.getOpponent(player, function (oppon) {
+        post.getId(oppon, function (res) {
+          nsp.to(res).emit('set-chance',msg);
+        });
+      });
+    });  })
   socket.on('refreshed game', function (msg) {
     var player = msg['user'];
     var oppo = null;

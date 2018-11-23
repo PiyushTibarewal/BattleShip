@@ -258,8 +258,12 @@ font-size:1.25em;} */
   height: 100px;
   background: #6F9FD8;
   overflow: auto;
+  position: fixed;
   /* overflow:scroll;
   overflow-x:hidden; */
+}
+#chat-name{
+  position: fixed;
 }
 table{
   border: 2px #2b2b2b solid;
