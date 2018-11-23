@@ -105,13 +105,15 @@ class ActivePlayers extends React.Component {
     $('#'+username).find(".rqst").html("request send");
   }
   player_profile(username){
+    console.log("give player info",username);
     socket.emit("give player info",username);
   }
 
   changePost(msg) {
     this.setState({ posts: msg });
   }
-
+  
+  
   componentDidMount() {
 
     socket.emit("started-home", sessionStorage.getItem('myusername'));
@@ -120,11 +122,17 @@ class ActivePlayers extends React.Component {
     document.getElementById('profileHyperlink').className = "";
     socket.on("display player info",function(msg){
       console.log(msg);
+      console.log("YO");
       $("#"+msg['username']).find(".g_p").html(msg['games_played']);
       $("#"+msg['username']).find(".po").html(msg['points']);
       $("#"+msg['username']).toggleClass('hidden');
     });
+    socket.on('request declined sendby', function (msg) {
+      console.log("declined request",msg);
     
+
+      $('#'+msg).find(".rqst").html("Sorry! "+msg+" declined your request.");
+    });
   }
 
   render() {
@@ -512,9 +520,6 @@ socket.on('start-game', function (msg) {
   ReactDOM.render(<Board />, document.getElementById('main'));
 });
 
-socket.on('request declined sendby', function (msg) {
-  alert("Sorry! " + msg + " declined your challenge request");
-});
 
 socket.on('set-username', function (msg) {
   user_name = msg; console.log('wefwwfcw', msg);

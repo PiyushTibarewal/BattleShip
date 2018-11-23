@@ -111,11 +111,11 @@ nsp.on('connection', function (socket) {
     refreshed = true;
   });
 
-  socket.on("give player info",function(msg){
+  socket.on("give player info", function (msg) {
     console.log(msg);
-    post.get_player_profile(msg,function(result){
+    post.get_player_profile(msg, function (result) {
       console.log(result);
-        socket.emit("display player info",{username: msg,games_played: result['games_played'],points: result['points']});
+      socket.emit("display player info", { username: msg, games_played: result['games_played'], points: result['points'] });
     });
   });
 
@@ -203,6 +203,7 @@ nsp.on('connection', function (socket) {
       });
     });
     nsp.to(socket.id).emit("render-home");
+    nsp.to(socket.id).emit("render-home");//Rendered twice to solve the toggle problem. ReactDom stores home twice,so not rendering. Populating ReactDOM with home thrice.
   });
 
   app.get('/logout', (req, res) => {
@@ -217,6 +218,8 @@ nsp.on('connection', function (socket) {
       post.changePoints(msg['user'], 10);
       post.changePoints(msg['opponent'], -5);
       nsp.to(socket.id).emit("render-home");
+      nsp.to(socket.id).emit("render-home");
+      nsp.to(result).emit("render-home");
       nsp.to(result).emit("render-home");
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
     });
@@ -227,6 +230,8 @@ nsp.on('connection', function (socket) {
       nsp.to(result).emit('message to display', "Opponenet Left. Congratulation, you won.");
       post.changePoints(msg['user'], 5);
       post.changePoints(msg['opponent'], -5);
+      nsp.to(socket.id).emit("render-home");
+      nsp.to(result).emit("render-home");
       nsp.to(socket.id).emit("render-home");
       nsp.to(result).emit("render-home");
       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
@@ -270,6 +275,8 @@ nsp.on('connection', function (socket) {
                       post.dropTable(msg['opponent'], function () { });
                       nsp.to(socket.id).emit("render-home");
                       nsp.to(result).emit("render-home");
+                      nsp.to(socket.id).emit("render-home");
+                      nsp.to(result).emit("render-home");
                       console.log("Match Over ", msg['user'], " won ", msg['opponent'], "lost");
                     }
                     else {
@@ -304,23 +311,31 @@ nsp.on('connection', function (socket) {
         nsp.emit('online-users', result);
       });
     });
-    setTimeout(function() {post.getUsername(socket.id, function (result) {
-      post.isOnline(result, function (result1) {
-        if (!result1) {
-          post.setIs_playing("N", result, function () { });
-          post.getOpponent(result, function (opponent) {
-            post.getId(opponent, function (result2) {
-              nsp.to(result2).emit('message to display', "Opponenet Left. Congratulation, you won.");
-              post.changePoints(result, -5);
-              post.changePoints(opponent, 5);
-              nsp.to(result2).emit("render-home");
-              console.log("Match Over ", result, " won ", opponent, "lost");
+    setTimeout(function () {
+      post.getUsername(socket.id, function (result) {
+        post.isOnline(result, function (result1) {
+          if (!result1) {
+            post.onlyIsPlaying(result, function (check) {
+              if (check) {
+                post.getOpponent(result, function (opponent) {
+                  post.getId(opponent, function (result2) {
+                    nsp.to(result2).emit('message to display', "Opponenet Left. Congratulation, you won.");
+                    post.changePoints(result, -5);
+                    post.changePoints(opponent, 5);
+                    nsp.to(result2).emit("render-home");
+                    nsp.to(result2).emit("render-home");
+                    console.log("Match Over ", result, " won ", opponent, "lost");
+                  });
+                });
+              }
+              post.setIs_playing("N", result, function () { });
             });
-          });
-        }
+          }
+        });
       });
-    })}, 2500);
+    }, 2500);
   });
+
   socket.emit('update-total-time', function (msg) {
     post.getadd_info(msg['user'], 1, "Update time", 2, function (result) {
       post.setadd_info(msg['user'], 1, result + 5 - msg['total_time'], 2);
