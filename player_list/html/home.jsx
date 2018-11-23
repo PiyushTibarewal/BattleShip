@@ -325,6 +325,9 @@ class Board extends React.Component {
       console.log("time");
       console.log(time);
     });
+    socket.on("shape_placed",function(msg){
+      $("#shape option[value=" + msg + "]").remove();
+    })
   }
 
   render() {
@@ -332,11 +335,11 @@ class Board extends React.Component {
       <div className="App">
         <div class="card">
           <div class="container">
-            <p id="turn"></p>
-            <p id="time"></p>
+            <div id="turn"></div>
+            <div id="time"></div>
           </div>
         </div>
-        <table summary="" width="300px" height="300px" className="sidexside" id="user">
+        <table summary="" width="300px" height="300px" border="1" className="sidexside table_of_user" id="user">
           <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
           <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -346,7 +349,7 @@ class Board extends React.Component {
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         </table>
-        <table summary="" width="300px" height="300px" className="sidexside" id="opponent">
+        <table summary="" width="300px" height="300px" border="1" className="sidexside table_of_opponenet" id="opponent">
           <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
           <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -412,7 +415,7 @@ class Chat extends React.Component {
       message: '',
       messages: []
     };
-
+  
     this.socket = socket;
 
     this.socket.on('RECEIVE_MESSAGE', function (data) {
@@ -435,7 +438,33 @@ class Chat extends React.Component {
       this.setState({ message: '' });
 
     }
+    $('#messages').animate({scrollTop: $('#messages').prop("scrollHeight")}, 500);
   }
+    componentDidMount() {
+    //   var height = 0;
+    //   $('#messages p').each(function(i, value){
+    //   height += parseInt($(this).height());
+    //     });
+
+    //   height += '';
+
+    // $('#messages').animate({scrollTop: height});
+    // d=$('#messages');
+    // d.scrollTop(d.prop("scrollHeight"));
+    // $('#messages').scrollTop($('#messages').height());
+    var input = document.getElementById("myInput");
+    input.addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        document.getElementById("myBtn").click();
+    }
+});
+// $('#messages').animate({
+//   scrollTop: $('#messages')[0].scrollHeight}, 2000);
+  $('#messages').animate({scrollTop: $('#messages').prop("scrollHeight")}, 500);    
+  }
+    
+
   render() {
     return (
       <div className="container">
@@ -445,19 +474,19 @@ class Chat extends React.Component {
               <div className="card-body">
                 <div className="card-title">Chat</div>
                 <hr />
-                <div className="messages">
+                <div className="messages" id="messages">
                   {this.state.messages.map(message => {
                     return (
-                      <div>{message.author}: {message.message}</div>
+                      <p>{message.author}: {message.message}</p>
                     )
                   })}
                 </div>
 
               </div>
               <div className="card-footer">
-                <input type="text" placeholder="Message" className="form-control" value={this.state.message} onChange={ev => this.setState({ message: ev.target.value })} />
+                <input type="text" id="myInput" placeholder="Message" className="form-control" value={this.state.message} onChange={ev => this.setState({ message: ev.target.value })} />
                 <br />
-                <button onClick={this.sendMessage} className="btn btn-primary form-control">Send</button>
+                <button id="myBtn"onClick={this.sendMessage} className="btn btn-primary form-control">Send</button>
               </div>
             </div>
           </div>

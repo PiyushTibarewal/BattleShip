@@ -359,6 +359,7 @@ nsp.on('connection', function (socket) {
               nsp.to(socket.id).emit('colour_change', { table: 'user', i: msg['i'] + entry[0], j: msg['j'] + entry[1], color: 'brown' });
               post.setBlockColour(msg['user'], msg['i'] + entry[0], msg['j'] + entry[1], 1, function () { });
             });
+            nsp.to(socket.id).emit("shape_placed",msg["shape"]);
             post.setadd_info(msg['user'], pos, 1, 1);
           }
           else {
