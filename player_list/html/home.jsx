@@ -15,29 +15,29 @@ var mychance = 0;
 var p = true;
 
 
-var click_url = "http://192.168.0.105:7777/Sounds/mouse_click.mp3";
+var click_url = "http://" + window.location.hostname + ":7777/Sounds/mouse_click.mp3";
 var click = new Audio(click_url);
-var ding_url = "http://192.168.0.105:7777/Sounds/ding.mp3";
+var ding_url = "http://" + window.location.hostname + ":7777/Sounds/ding.mp3";
 var ding = new Audio(ding_url);
-var exp_url = "http://192.168.0.105:7777/Sounds/explosion.mp3";
+var exp_url = "http://" + window.location.hostname + ":7777/Sounds/explosion.mp3";
 var exp = new Audio(exp_url);
-var mfail_url = "http://192.168.0.105:7777/Sounds/mission_failed.mp3";
+var mfail_url = "http://" + window.location.hostname + ":7777/Sounds/mission_failed.mp3";
 var mfail = new Audio(mfail_url);
-var slip_url = "http://192.168.0.105:7777/Sounds/slip.mp3";
+var slip_url = "http://" + window.location.hostname + ":7777/Sounds/slip.mp3";
 var slip = new Audio(slip_url);
+var victory_url = "http://" + window.location.hostname + ":7777/Sounds/victory.mp3";
+var victory = new Audio(victory_url);
+var swoosh_url = "http://" + window.location.hostname + ":7777/Sounds/swoosh.mp3";
+var swoosh = new Audio(swoosh_url);
 
 
 // var homecur = 'style="cursor: url(http://' + window.location.hostname + ':7777/cursors/home.cur),default;"';
 class RuleBook extends React.Component {
   constructor(props) {
     super(props);
-    this.url = "http://192.168.0.105:7777/Sounds/mouse_click.mp3";
-    this.audio = new Audio(click);
   }
 
   componentDidMount() {
-    slip.pause();
-    // this.audio.play();
     click.play();
     document.getElementById('addHyperLink').className = "";
     document.getElementById('homeHyperlink').className = "";
@@ -49,6 +49,30 @@ class RuleBook extends React.Component {
       <div>
         <h3>Rules</h3>
         <p>Battleship</p>
+        <p><b>No. of Players</b>-<b>2</b></p>
+        <p><b>Main Objective</b>-<b>Sink all opponent's ships before opponent sinks your</b></p>
+        <p>Battleship is a war-themed board game for two players in which the opponents try to guess the location of the other's various ships. The object of the game is to guess the location of the ships each player hides on a plastic grid containing vertical and horizontal space coordinates. Players take turns calling out row and column coordinates on the other player's grid in an attempt to identify a square that contains a ship. 
+</p>
+        <h4><b>Setting Up the Board Game</b></h4>
+        <ul>
+          <li>Each player receives a game board with two grids - Ocean Grid and Target Grid.</li>
+          <li>Each player secretly places six ships (I shaped Carrier, L shaped Carrier,T shaped Carrier, 3 Decker Cruiser, 2 Decker Destroyer, 1 Decker Submarine) in his ocean grid. and Press start to declare he is done placing.</li>
+          <li>Each ship must be placed horizontally or vertically—not diagonally—across grid spaces, and the ships can't hang off the grid. Ships can touch each other, but they can't occupy the same grid space. You cannot change the position of the ships after the game begins.
+</li>
+        </ul>
+        <h4><b>Basic GamePlay</b></h4>
+        <ul>
+          <li>The player who placed ships first gets the first turn.</li>
+          <li>On your turn, you will be given 5 Seconds, you have click on the target grid block where you want to fire, It will turn red if it was a miss or green if you hit any ship.</li>
+          <li>If you hit a ship you will get one more turn.</li>
+          <li>On opponent's turn, He will do the same, If he hit your ship that block will turn red in your ocean grid else red.</li>
+          <li>First player to sunk all ship wins.</li>
+        </ul>
+        <h4><b>Points System</b></h4>
+        <ul>
+          <li>The winning player get 5 points and loser loses 2 points.</li>
+          <li>Winner gets a bonus of 5 points if his total gameplay was less than 30 second.</li>
+        </ul>
       </div>
     )
   }
@@ -69,6 +93,7 @@ class LeaderBoard extends React.Component {
 
 
   componentDidMount() {
+    click.play();
     socket.emit("started-leaderboard", "challenge accepted");
     document.getElementById('homeHyperlink').className = "";
     document.getElementById('addHyperLink').className = "active";
@@ -121,10 +146,12 @@ class ActivePlayers extends React.Component {
     socket.emit("send-request", username);
     $("#" + username).find(".mybt").hide();
     $('#' + username).find(".rqst").html("request send");
+    click.play();
   }
   player_profile(username) {
     console.log("give player info", username);
     socket.emit("give player info", username);
+    click.play();
   }
 
   changePost(msg) {
@@ -133,7 +160,7 @@ class ActivePlayers extends React.Component {
 
 
   componentDidMount() {
-
+    click.play();
     socket.emit("started-home", sessionStorage.getItem('myusername'));
     document.getElementById('homeHyperlink').className = "active";
     document.getElementById('addHyperLink').className = "";
@@ -202,9 +229,11 @@ class ChallengeRequest extends React.Component {
   }
 
   yes() {
+    click.play();
     socket.emit('challenge-accepted', this.props.username);
   }
   no() {
+    click.play();
     socket.emit('challenge-declined', this.props.username);
   }
 
@@ -212,7 +241,7 @@ class ChallengeRequest extends React.Component {
 
     return (
       <div>
-        <h2>{this.props.username} thinks he can defeat you. Do you accept his challenge.</h2>
+        <h2>{this.props.username} thinks he can defeat you. Wanna show him he can't?.</h2>
         <button type="button" onClick={this.yes} id="submit" name="submit" className="btn btn-primary pull-right">Yes</button>
         <button type="button" onClick={this.no} id="submit" name="submit" className="btn btn-primary pull-right">No</button>
       </div>
@@ -235,6 +264,7 @@ class Board extends React.Component {
     var t = setTimeout(this.changetime, 1000);
   }
   componentDidMount() {
+    click.play();
     document.getElementById('time').innerHTML = time;
     document.getElementById('turn').innerHTML = "May the odds be in your favour!";
 
@@ -258,6 +288,7 @@ class Board extends React.Component {
         if (name == 'user') {
         }
         else {
+          click.play();
           socket.emit("chance_played", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1 });
         };
       }
@@ -298,9 +329,11 @@ class Board extends React.Component {
     });
 
     $("#start_game").click(function () {
+      click.play();
       socket.emit('can game be started', { user: user_name, opponent: opponent_name });
     });
     $("#leave_game").click(function () {
+      click.play();
       socket.emit('left game', { user: user_name, opponent: opponent_name });
     });
     socket.on('get-chance', function (msg) {
@@ -344,7 +377,20 @@ class Board extends React.Component {
       var c = msg['j'];
       var r2 = Number(r) - 1;
       var c2 = Number(c) - 1;
-      if (msg['color'] != 'brown' && msg['color'] != 'grey' && msg['color'] != 'white' && msg['color'] != 'black') {
+      if (msg['color']=='brown') {swoosh.play();}
+      if (msg['color'] != 'brown' && msg['color'] != 'grey' && msg['color'] != 'white' && msg['color'] != 'rgba(0,0,0,0)' && msg['color'] != 'black') {
+        if (msg['color']=='red' && tb == 'user'){
+          exp.play();
+        }
+        if (msg['color']=='green' && tb == 'user'){
+          slip.play();
+        }
+        if (msg['color']=='red' && tb == 'opponent'){
+          slip.play();
+        }
+        if (msg['color']=='green' && tb == 'opponent'){
+          exp.play();
+        }
         if (mychance == 1)
           socket.emit('update-total-time', { total_time: Number(time), user: user_name, opponent: opponent_name });
         time = 5;
@@ -464,9 +510,10 @@ class Chat extends React.Component {
 
     this.socket.on('RECEIVE_MESSAGE', function (data) {
       addMessage(data);
+      ding.play();
     });
     this.socket.on('get-chat', function () {
-      socket.emit('receive-chat', this.state.messages)
+      socket.emit('receive-chat', this.state.messages);
     });
     this.socket.on('set-msg', function (msg) {
        this.state.messages=msg;
@@ -480,6 +527,7 @@ class Chat extends React.Component {
 
     this.sendMessage = ev => {
       ev.preventDefault();
+      click.play();
       this.socket.emit('SEND_MESSAGE', {
         author: user_name,
         to_send: opponent_name,
@@ -552,6 +600,7 @@ class Congrats extends React.Component {
 
   }
   render() {
+    victory.play();
     return (
       <div id="congrats">
         <span></span>
@@ -593,6 +642,7 @@ class Fail extends React.Component {
 
   }
   render() {
+    mfail.play();
     return (
       <div id="congrats">
         <span></span>

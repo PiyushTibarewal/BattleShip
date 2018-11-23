@@ -237,6 +237,7 @@ module.exports = {
 		var col_no = 'col_'+col;
 		var sqlq = "select "+col_no+" from "+user+" where row_no=?";// might be an error
 		db1.connection.query(sqlq,[row], (err,rows) => {
+			if (err) throw err;
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
 			console.log("checkig username",user);

@@ -160,14 +160,26 @@ table, td
     cursor: url("cursors/home.cur"),default;
   }
 
+  btn {
+    cursor: url("cursors/home.cur"),default;
+  }
+
+  a {
+    cursor: url("cursors/home.cur"),default;
+  }
+
   table.tuser {
-    cursor: url("cursors/grab.png"),default;
+    cursor: url("cursors/home.cur"),default;
     z-index: 1;
   }
 
   table.toppo {
-    cursor: url("cursors/target.png"),default;
+    cursor: url("cursors/home.cur"),default;
     z-index: 1;
+  }
+
+  button {
+    cursor: url("cursors/home.cur"),default;
   }
 
   #bg {
@@ -280,7 +292,7 @@ table{
 border-collapse: separate;
 margin-bottom: 20px;
 empty-cells: show;
-opacity: 0.5;
+opacity: 0.7;
 }
 td,th{
   border: 2px #2b2b2b solid;
@@ -288,6 +300,7 @@ td,th{
 table.table_of_user{
   /* border:1; */
   empty-cells: show;
+  z-index: 1;
 }
 .table_of_user td{
   border-radius: 5px;
@@ -295,9 +308,10 @@ table.table_of_user{
 table.table_of_opponent{
   /* border:1; */
   empty-cells: show;
-}
-.table_of_opponent{
+  z-index: 1;
   border-radius: 5px;
+}
+.table_of_opponent td {
 }
 #turn{
   border: 2px solid #dedede;
