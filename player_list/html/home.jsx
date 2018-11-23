@@ -9,7 +9,7 @@ var show = null;
 var leader = null;
 var opponent_name = null;
 var is_playing = 0;
-var time = 50;
+var time = 5;
 var board = null;
 var mychance = 0;
 var p = true;
@@ -332,7 +332,7 @@ class Board extends React.Component {
       if (msg['color'] != 'brown' && msg['color'] != 'grey' && msg['color'] != 'white' && msg['color'] != 'black') {
         if(mychance==1)
           socket.emit('update-total-time',{ total_time : Number(time), user: user_name, opponent: opponent_name });
-        time = 50;
+        time = 5;
         document.getElementById('time').innerHTML = time;
       }
       var v1 = Number((8 * r2)) + Number(c2); console.log(v1);
@@ -619,12 +619,12 @@ class Congrats extends React.Component{
 }
 
 socket.on('render-won', function () {
-  time = 50;
+  time = 5;
   ReactDOM.render(<Congrats />,
     document.getElementById('main'));
 });
 socket.on('render-lost', function () {
-  time = 50;
+  time = 5;
   ReactDOM.render(<Congrats />,
     document.getElementById('main'));
 });
@@ -679,7 +679,7 @@ if (window.performance) {
 };
 socket.emit('home-initialized');
 socket.on('render-home', function () {
-  time = 50;
+  time = 5;
   ReactDOM.render(<HomePage />,
     document.getElementById('main'));
 });
