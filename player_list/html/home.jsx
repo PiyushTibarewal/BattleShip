@@ -289,7 +289,24 @@ class Board extends React.Component {
     $("#leave_game").click(function () {
       socket.emit('left game', { user: user_name, opponent: opponent_name });
     });
-
+    socket.on('get-chance', function (msg) {
+      if (mychance==0) {
+        socket.emit('receive-chance',1);
+      }
+     
+    });
+    socket.on('set-time', function (msg) {
+      time=msg;
+     
+    });
+    socket.on('set-mychance', function (msg) {
+      if (msg) {
+        mychance = true;
+      }
+      else {
+        mychance = false;
+      }
+    });
     socket.on("game_play", function (msg) {
       $("#start_game").hide();
       $('#shape').hide();
@@ -430,6 +447,12 @@ class Chat extends React.Component {
 
     this.socket.on('RECEIVE_MESSAGE', function (data) {
       addMessage(data);
+    });
+    this.socket.on('get-chat', function () {
+      socket.emit('receive-chat', this.state.messages)
+    });
+    this.socket.on('set-msg', function (msg) {
+       this.state.messages=msg;
     });
 
     const addMessage = data => {
@@ -572,7 +595,7 @@ socket.on("render game as refresh", function (msg) {
   opponent_name = msg;
   user_name = sessionStorage.getItem("myusername");
   ReactDOM.render(<Board />, document.getElementById('main'));
-  socket.emit("refreshed game", { user: sessionStorage.getItem("myusername"), opponent: opponent_name });
+  socket.emit("refreshed game", { user: sessionStorage.getItem("myusername") });
 });
 
 socket.on('online-users', function (msg) {

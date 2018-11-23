@@ -449,10 +449,27 @@ nsp.on('connection', function (socket) {
       }
     });
   });
-
+  var ms = null;
+  var t = null;
+  var chance=0;
+  socket.on('receive-chat',function(msg){
+    ms=msg;
+  })
+  socket.on('receive-time',function(msg){
+    t=msg;
+  })
+  socket.on('receive-chance',function(msg){
+    chance=msg;
+  })
   socket.on('refreshed game', function (msg) {
     var player = msg['user'];
-    var oppo = msg['opponent'];
+    var oppo =null;
+    post.getOpponent(player,function(oppon){
+    oppo=oppon;
+    post.getId(oppo, function (res) {
+    nsp.to(res).emit('get-chat');
+    nsp.to(res).emit('get-chance');
+    nsp.to(res).emit('get-time');});});
     console.log("request to retrive board ", msg);
     post.getadd_info(player, 1, "game started", 1, function (turn) {
       if (turn == 1) {
@@ -508,7 +525,9 @@ nsp.on('connection', function (socket) {
       }
       else console.log("Major ERROR app.js socket.on refreshed home");
     });
-
+    socket.emit('set-msg',ms);
+    socket.emit('set-time',t);
+    socket.emit('set-chance',chance);
 
 
   });
