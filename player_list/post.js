@@ -1,6 +1,10 @@
 const db1 = require('./db');
 module.exports = {
 
+	initializeServer : function () {
+		db1.connection.query("update game_user set online='N', is_playing='N'");
+	},
+
 	getUsername: function (id, callback) {
 		console.log("getting username of socid ", id);
 		db1.connection.query("select username from game_user where id=?", [id], (err, rows) => {
@@ -51,7 +55,7 @@ module.exports = {
 
 	getLeaderBoard: function (callback) {
 
-		db1.connection.query("select username,games_played,points from game_user ORDER BY points", (err, rows) => {
+		db1.connection.query("select username,games_played,points from game_user ORDER BY points DESC", (err, rows) => {
 			if (err == null) {
 				console.log("get leaderboard using getLeaderBoard");
 				callback(rows)
@@ -80,6 +84,21 @@ module.exports = {
 		});
 
 	},
+	isOnline: function (msg, callback) {
+
+		db1.connection.query("select online from game_user where username=?", [msg], (err, rows) => {
+			var result = JSON.stringify(rows);
+			var red = JSON.parse(result);
+			var online = red[0]['online'];
+			if (online == "Y") {
+				callback(true);
+			}
+			else {
+				callback(false);
+			}
+		});
+
+	},
 
 	setId: function (id, username,callback) {
 		console.log("starting to set id of ", username, " to ", id, "in sql request");
@@ -96,19 +115,16 @@ module.exports = {
 		});
 	},
 
-	changePoints: function (username, change) {
+	changePoints: function (username, val) {
 		// console.log("starting to set id of ", username, " to ", id, "in sql request");
 		db1.connection.query("select points,games_played from game_user where username=?", [username], (error,row) => {
 			var result = JSON.stringify(row);
 			var red = JSON.parse(result);
 			var points = red[0]['points'];
 			var games = red[0]['games_played'];
-			if (change) {
-				points=points+10;
-			}
-			else points=points-5;
+				points=points+Number(val);
 			games=games+1;
-			console.log("change points",points,games,result,red,error,username,change);
+			console.log("change points",points,games,result,red,error,username,val);
 			db1.connection.query("update game_user set points=?, is_playing='N', opponent='nil', games_played=? where username=?", [points,games,username]);
 		});
 	},
@@ -127,21 +143,18 @@ module.exports = {
 		});
 	},
 
-	deletePost: function (id, callback) {
-		db1.connection.query("update game_user set online=?, is_playing=? where username=?", ["N", "N", id], (err, rows) => {
-			if (err == null) {
-				console.log("Deleted the post.", id);
-				callback(true);
-			}
-			else {
-				console.log(" not Deleted the post.");
-				callback(false);
-			}
+	getOpponent: function (user,callback) {
+		db1.connection.query("select opponent from game_user where username=?", [user], (err, rows) => {
+			if (err) throw err;
+			var result = JSON.stringify(rows);
+			var red = JSON.parse(result);
+			var opponent = red[0]['opponent'];
+			callback(opponent);
 		});
 	},
 
 	deletePostSocket: function (id, callback) {
-		db1.connection.query("update game_user set online=?, is_playing=? where id=?", ["N","N", id], (err, rows) => {
+		db1.connection.query("update game_user set online='N' where id=?", [id], (err, rows) => {
 			if (err == null) {
 				console.log("Deleted the post_socket.", id);
 				callback(true);
@@ -163,7 +176,7 @@ module.exports = {
 	},
 
 	initializetGame	: function (first,second,callback) {
-		var sqlq1 = "create table "+first+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
+		var sqlq1 = "create table "+first+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info_1 INT default 0,add_info_2 INT default 0)";
 		db1.connection.query(sqlq1, (err,row) => {
 			var sqlq11 = "insert into "+first+" (row_no) values (1)";
 			var sqlq12 = "insert into "+first+" (row_no) values (2)";
@@ -182,7 +195,7 @@ module.exports = {
 			db1.connection.query(sqlq17, (e,r) => {});
 			db1.connection.query(sqlq18, (e,r) => {});
 		});
-		var sqlq2 = "create table "+second+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info INT default 0)";
+		var sqlq2 = "create table "+second+" (row_no INT, col_1 INT default 0, col_2 INT default 0, col_3 INT default 0, col_4 INT default 0, col_5 INT default 0, col_6 INT default 0, col_7 INT default 0, col_8 INT default 0, add_info_1 INT default 0,add_info_2 INT default 0)";
 		db1.connection.query(sqlq2, (err,row) => {
 			var sqlq21 = "insert into "+second+" (row_no) values (1)";
 			var sqlq22 = "insert into "+second+" (row_no) values (2)";
@@ -205,14 +218,13 @@ module.exports = {
 		callback(true);
 	},
 
-	checkBlock : function (user,row,col,callback) {
+	getBlock : function (user,row,col,callback) {
 		var col_no = 'col_'+col;
 		var sqlq = "select "+col_no+" from "+user+" where row_no=?";// might be an error
 		db1.connection.query(sqlq,[row], (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
 			var check = red[0][col_no];
-			console.log(check,red,result,"hii","col_no",col_no,sqlq);
 			callback(check);
 			console.log(user,"'s opponent tried to hit ",row,",",col,"output=",check);
 		});
@@ -224,7 +236,7 @@ module.exports = {
 			if (err) throw err;
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
-			console.log("inside gameOver",rows,result,red,red.length,sqlq);
+			// console.log("inside gameOver",rows,result,red,red.length,sqlq);
 			if (red.length == 0) {
 				callback(true);
 				console.log("game Over ",user," lost");
@@ -246,18 +258,18 @@ module.exports = {
 		});
 	},
 
-	setadd_info : function (user, i, val) {
-		var sqlq = "update "+user+" set add_info=? where row_no=?";
+	setadd_info : function (user, i, val,col) {
+		var sqlq = "update "+user+" set add_info_"+col+"=? where row_no=?";
 		db1.connection.query(sqlq,[val,i], (err,rows) => {if (err) throw err});
 		console.log("updated add_info of u,i",user,i);
 	},
 
-	getadd_info : function (user, i, shape, callback) {
-		var sqlq = "select add_info from "+user+" where row_no=?";
+	getadd_info : function (user, i, shape,col, callback) {
+		var sqlq = "select add_info_"+col+" from "+user+" where row_no=?";
 		db1.connection.query(sqlq,[i], (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
-			var check = red[0]['add_info'];
+			var check = red[0]['add_info_'+col];
 			console.log("retriving getaddd_info of user,i,shape:",user,i,shape," return check :",check);
 			callback(check);
 		});
@@ -265,7 +277,7 @@ module.exports = {
 
 	checkGameStart : function (user, callback) {
 		console.log("checking if all ships are placed in sea grid of ",user);
-		var sqlq = "select row_no from "+user+" where row_no>2 and add_info=1";
+		var sqlq = "select row_no from "+user+" where row_no>2 and add_info_1=1";
 		db1.connection.query(sqlq, (err,rows) => {
 			var result = JSON.stringify(rows);
 			var red = JSON.parse(result);
@@ -319,6 +331,36 @@ module.exports = {
 					callback(false);
 				}
 		});
+	}
+
+	getPlayerBoard: function (player, i, j, callback) {
+		if (i != 8 || j != 8) {
+			var hi =this;
+			if ( j != 8 ) {
+				this.getBlock(player, i, j, function (block) {
+					var new_item = [[i,j,block]];
+					hi.getPlayerBoard(player, i, j+1, function (result) {
+						var ne = result.concat(new_item);
+						callback(ne);
+					});
+				});
+			}
+			else {
+				this.getBlock(player, i, j, function (block) {
+					var new_item = [[i,j,block]];
+					hi.getPlayerBoard(player, i+1, 1, function (result) {
+						var ne = result.concat(new_item);
+						callback(ne);
+					});
+				});
+			}
+		}
+		else {
+			this.getBlock(player, i, j, function (block) {
+				var new_item = [[i,j,block]];
+				callback(new_item);
+			});
+		}
 	}
 
 	// checkBlocks : function (user,i,j,Blocks,callback) {
