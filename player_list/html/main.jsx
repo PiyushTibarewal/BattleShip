@@ -107,7 +107,7 @@ class Signup extends React.Component {
           alert("This username is already taken");
         }
         else{
-          alert("successfully signed up");
+          alert("Successfully signed up. Please signin again to continue.");
         }
       })
       .catch(function (error) {
