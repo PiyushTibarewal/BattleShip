@@ -13,6 +13,7 @@ var time = 5;
 var board = null;
 var mychance = 0;
 var p = true;
+var chat = null;
 class RuleBook extends React.Component {
 
   componentDidMount() {
@@ -290,6 +291,7 @@ class Board extends React.Component {
       socket.emit('left game', { user: user_name, opponent: opponent_name });
     });
     socket.on('get-chance', function (msg) {
+      console.log('Send to opponent chance');
       if (mychance==0) {
         socket.emit('receive-chance',1);
       }
@@ -439,7 +441,7 @@ class HomePage extends React.Component {
 class Chat extends React.Component {
   constructor(props) {
     super(props);
-
+    chat =this;
     this.state = {
       username: user_name,
       message: '',
@@ -452,10 +454,13 @@ class Chat extends React.Component {
       addMessage(data);
     });
     this.socket.on('get-chat', function () {
-      socket.emit('receive-chat', this.state.messages)
+      console.log('send to opponent',chat.state.messages)
+      socket.emit('receive-chat', chat.state.messages)
     });
     this.socket.on('set-msg', function (msg) {
-       this.state.messages=msg;
+      console.log('Received message',msg)
+      chat.setState({ messages:msg });
+      
     });
 
     const addMessage = data => {
