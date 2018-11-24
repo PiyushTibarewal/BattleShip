@@ -29,6 +29,7 @@ var victory_url = "http://" + window.location.hostname + ":7777/Sounds/victory.m
 var victory = new Audio(victory_url);
 var swoosh_url = "http://" + window.location.hostname + ":7777/Sounds/swoosh.mp3";
 var swoosh = new Audio(swoosh_url);
+var chat = null; 
 
 
 // var homecur = 'style="cursor: url(http://' + window.location.hostname + ':7777/cursors/home.cur),default;"';
@@ -43,7 +44,7 @@ class RuleBook extends React.Component {
     document.getElementById('homeHyperlink').className = "";
     document.getElementById('profileHyperlink').className = "active";
   }
-
+ 
   render() {
     return (
       <div>
@@ -91,7 +92,6 @@ class LeaderBoard extends React.Component {
     this.setState({ posts: msg });
   }
 
-
   componentDidMount() {
     click.play();
     socket.emit("started-leaderboard", "challenge accepted");
@@ -134,7 +134,7 @@ class ActivePlayers extends React.Component {
 
     super(props);
     this.updatePost = this.updatePost.bind(this);
-    this.player_profile = this.player_profile.bind(this);
+    this.player_profile=this.player_profile.bind(this);
     this.state = {
       posts: [],
     };
@@ -157,62 +157,61 @@ class ActivePlayers extends React.Component {
   changePost(msg) {
     this.setState({ posts: msg });
   }
-
-
+  
+  
   componentDidMount() {
     click.play();
     socket.emit("started-home", sessionStorage.getItem('myusername'));
     document.getElementById('homeHyperlink').className = "active";
     document.getElementById('addHyperLink').className = "";
     document.getElementById('profileHyperlink').className = "";
-    socket.on("display player info", function (msg) {
+    socket.on("display player info",function(msg){
       console.log(msg);
       console.log("YO");
-      $("#" + msg['username']).find(".g_p").html(msg['games_played']);
-      $("#" + msg['username']).find(".po").html(msg['points']);
-      if (p) {
-        p = false;//Socket called twice here.
-        $("#" + msg['username']).toggleClass('hidden');
-      }
-      setTimeout(function () { p = true }, 500);
-    });
+      $("#"+msg['username']).find(".g_p").html(msg['games_played']);
+      $("#"+msg['username']).find(".po").html(msg['points']);
+      if(p){ p=false;//Socket called twice here.
+      $("#"+msg['username']).toggleClass('hidden');
+    }
+    setTimeout(function(){p=true},500);
+  });
     socket.on('request declined sendby', function (msg) {
-      console.log("declined request", msg);
+      console.log("declined request",msg);
+    
 
-
-      $('#' + msg).find(".rqst").html("Sorry! " + msg + " declined your request.");
+      $('#'+msg).find(".rqst").html("Sorry! "+msg+" declined your request.");
     });
   }
 
   render() {
 
     return (
-      <div><center><p><b>Active Players</b></p></center>
-        <div id="accordion">
+    <div><center><p><b>Active Players</b></p></center>
+        <div  id="accordion">
           {
             this.state.posts.map(function (post, index) {
               if (post.username != sessionStorage.getItem('myusername')) {
-                {/* return <tr key={index} > */ }
-                {/* <td>{index + 1}</td> className="table table-striped"*/ }
-                return <div>
-                  <div id="heading">
-                    <h5 >
-                      <button className="btn btn-primary btn-lg btn-block" onClick={this.player_profile.bind(this, post.username)}>{post.username}
-                      </button>
-                    </h5>
-                  </div>
-                  <div id={post.username} className="hidden" >
-                    <div className="card-body">
-                      <span >games_played : </span><span className="g_p" ></span><span>  points : </span><span className="po" ></span>
-                      <button onClick={this.updatePost.bind(this, post.username)} className="mybt glyphicon glyphicon-send">Challenge</button><b><span className="rqst"></span></b>
-                    </div>
-                  </div>
-                </div>
+              {/* return <tr key={index} > */}
+                {/* <td>{index + 1}</td> className="table table-striped"*/}
+                return <div>     
+      <div  id="heading">
+        <h5 >
+          <button className="btn btn-primary btn-lg btn-block" onClick={this.player_profile.bind(this,post.username)}>{post.username}
+        </button>
+        </h5>
+      </div>
+      <div id={post.username} className="hidden" >
+        <div className="card-body">
+           <span >games_played : </span><span className="g_p" ></span><span>  points : </span><span className="po" ></span>
+           <button  onClick={this.updatePost.bind(this, post.username)} className="mybt glyphicon glyphicon-send">Challenge</button><b><span className="rqst"></span></b>
+        </div>
+      </div>
+      </div>
               }
             }.bind(this))
           }
-        </div>
-      </div>
+          </div>
+          </div>    
     )
   }
 };
@@ -266,7 +265,7 @@ class Board extends React.Component {
   componentDidMount() {
     click.play();
     document.getElementById('time').innerHTML = time;
-    document.getElementById('turn').innerHTML = "May the odds be in your favour!";
+    document.getElementById('turn').innerHTML = "May the odds be in your favour.";
 
     $('td').click(function () {
       var name = $(this).closest('table').attr('id');
@@ -311,22 +310,22 @@ class Board extends React.Component {
         }
       }
       //emit when hovering over i,j 
-    }, function () {
-      var name = $(this).closest('table').attr('id');
+   },function () {
+    var name = $(this).closest('table').attr('id');
 
-      var c = $(this).parent().children().index($(this));
-      var r = $(this).parent().parent().children().index($(this).parent());
-      if (is_playing == 0) {
-        var a = $('#shape').val();
-        console.log(a);
-        var b = $('#h_or_v').val();
-        console.log(b);
-        if (name == 'user') {
-          socket.emit("hover_out", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
-        }
+    var c = $(this).parent().children().index($(this));
+    var r = $(this).parent().parent().children().index($(this).parent());
+    if (is_playing == 0) {
+      var a = $('#shape').val();
+      console.log(a);
+      var b = $('#h_or_v').val();
+      console.log(b);
+      if (name == 'user') {
+        socket.emit("hover_out", { user: user_name, opponent: opponent_name, i: Number(r) + 1, j: Number(c) + 1, shape: a, h_or_v: b });
       }
-      //emit when hovering out of i,j 
-    });
+    }
+    //emit when hovering out of i,j 
+ });
 
     $("#start_game").click(function () {
       click.play();
@@ -336,29 +335,38 @@ class Board extends React.Component {
       click.play();
       socket.emit('left game', { user: user_name, opponent: opponent_name });
     });
-    socket.on('get-chance', function (msg) {
+    socket.on('get-chance', function () {
+      console.log('Send to opponent chance');
       if (mychance==0) {
         socket.emit('receive-chance',1);
       }
-     
     });
+    socket.on('get-time', function () {
+      console.log('Send to opponent chance');
+        socket.emit('receive-time',time); 
+      
+    });
+
     socket.on('set-time', function (msg) {
       time=msg;
-     
+      time=time+2;
+      if(is_playing==1)
+     board.changetime();
     });
-    socket.on('set-mychance', function (msg) {
+    socket.on('set-chance', function (msg) {
       if (msg) {
-        mychance = true;
+        mychance = 1;
       }
       else {
-        mychance = false;
+        mychance = 0;
       }
     });
     socket.on("game_play", function (msg) {
       $("#start_game").hide();
       $('#shape').hide();
       $('#h_or_v').hide();
-      is_playing = 1;
+      // $('#leave_game').hide();
+      is_playing=1;
     });
     socket.on('message to display', function (msg) {
       document.getElementById('turn').innerHTML = msg;
@@ -416,7 +424,7 @@ class Board extends React.Component {
       console.log(time);
     });
     socket.on("shape_placed",function(msg){
-      $("#shape option[value=" + msg + "]").remove();
+      // $("#shape option[value=" + msg + "]").remove();
     })
   }
 
@@ -439,7 +447,7 @@ class Board extends React.Component {
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         </table>
-        <table summary="" width="300px" height="300px" border="1" className="sidexside table_of_opponenet" id="opponent">
+        <table summary="" width="300px" height="300px" border="1" className="sidexside table_of_opponent" id="opponent">
           <tr><td></td><td></td><td></td><td ></td><td></td><td></td><td></td><td></td></tr>
           <tr><td ></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -499,7 +507,7 @@ class HomePage extends React.Component {
 class Chat extends React.Component {
   constructor(props) {
     super(props);
-
+    chat =this;
     this.state = {
       username: user_name,
       message: '',
@@ -513,10 +521,13 @@ class Chat extends React.Component {
       ding.play();
     });
     this.socket.on('get-chat', function () {
-      socket.emit('receive-chat', this.state.messages);
+      console.log('send to opponent',chat.state.messages)
+      socket.emit('receive-chat', chat.state.messages)
     });
     this.socket.on('set-msg', function (msg) {
-       this.state.messages=msg;
+      console.log('Received message',msg)
+      chat.setState({ messages:msg });
+      
     });
 
     const addMessage = data => {
@@ -570,7 +581,7 @@ class Chat extends React.Component {
           <div className="col-4">
             <div className="card">
               <div className="card-body">
-                <div className="card-title">Chat</div>
+                <div className="card-title" id="chat-name">Chat</div>
                 <hr />
                 <div className="messages" id="messages">
                   {this.state.messages.map(message => {
@@ -594,8 +605,8 @@ class Chat extends React.Component {
   }
 }
 
-class Congrats extends React.Component {
-  constructor() {
+class Congrats extends React.Component{
+  constructor(){
     super();
 
   }
@@ -657,7 +668,7 @@ class Fail extends React.Component {
         <span></span>
         <span></span>
         <span></span>
-        <h2>Sorry you lost!</h2>
+        <h2>Sorry mission failed! We will get them next time. </h2>
 
 
         <span></span>
@@ -677,18 +688,23 @@ class Fail extends React.Component {
     );
   }
 }
-socket.on('render-lost', function () {
-  ReactDOM.render(<Fail />, document.getElementById('main'));
-});
+
 socket.on('render-won', function () {
-  ReactDOM.render(<Congrats />, document.getElementById('main'));
+  time = 5;
+  ReactDOM.render(<Congrats />,
+    document.getElementById('main'));
+});
+socket.on('render-lost', function () {
+  time = 5;
+  ReactDOM.render(<Fail />,
+    document.getElementById('main'));
 });
 socket.on("render game as refresh", function (msg) {
-  console.log("refreshed game page oppo", msg);
+  console.log("refreshed game page oppo",msg);
   opponent_name = msg;
-  user_name = sessionStorage.getItem("myusername");
-  ReactDOM.render(<Board />, document.getElementById('main'));
-  socket.emit("refreshed game", { user: sessionStorage.getItem("myusername") });
+  user_name=sessionStorage.getItem("myusername");
+  ReactDOM.render(<Board />,document.getElementById('main'));
+  socket.emit("refreshed game",{ user: sessionStorage.getItem("myusername"), opponent: opponent_name });
 });
 
 socket.on('online-users', function (msg) {
